@@ -1,0 +1,20 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>login {{ ape | uppercase}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-input label="Nombre de Usuario" labelPlacement="floating" Placeholder="Ingrese su Nombre de Usuario" [(ngModel)]="arregloPersona.apellido"></ion-input>
+
+  <p>{{ arregloPersona.nombre }}</p>
+  <ion-item>
+    <ion-input label="Nombre de usuario" labelPlacement="floating" placeholder="Ingrese su nombre de usuario" [(ngModel)]="arregloPersona.apellido"></ion-input>
+  </ion-item>
+
+  <ion-button color="success" [routerLink]="['/home']">Ir al Home {{ arregloPersona.apellido }}</ion-button>
+  <ion-button color="warning" (click)="irPagina()">Ir a Agregar</ion-button>
+</ion-content>
