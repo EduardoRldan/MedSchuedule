@@ -1,24 +1,37 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
+import { Component } from '@angular/core';
+import { MenuController } from '@ionic/angular';
 
-import { HomePage } from './home.page';
+@Component({
+  selector: 'app-example',
+  templateUrl: 'example.component.html',
+})
+export class ExampleComponent {
+  constructor(private menuCtrl: MenuController) {}
 
-describe('HomePage', () => {
-  let component: HomePage;
-  let fixture: ComponentFixture<HomePage>;
+  openFirstMenu() {
+    /**
+     * Open the menu by menu-id
+     * We refer to the menu using an ID
+     * because multiple "start" menus exist.
+     */
+    this.menuCtrl.open('first-menu');
+  }
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [HomePage],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+  openSecondMenu() {
+    /**
+     * Open the menu by menu-id
+     * We refer to the menu using an ID
+     * because multiple "start" menus exist.
+     */
+    this.menuCtrl.open('second-menu');
+  }
 
-    fixture = TestBed.createComponent(HomePage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+  openEndMenu() {
+    /**
+     * Open the menu by side
+     * We can refer to the menu by side
+     * here because only one "end" menu exists
+     */
+    this.menuCtrl.open('end');
+  }
+}
