@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { ModificarPage } from './modificar.page';
+import { BarraDespegablePage } from './barra-despegable.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: ModificarPage
+    component: BarraDespegablePage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ModificarPageRoutingModule {}
+export class BarraDespegablePageRoutingModule {}

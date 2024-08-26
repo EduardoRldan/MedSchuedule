@@ -12,20 +12,36 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'login',
-    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
+    path: 'sucursales',
+    loadChildren: () => import('./pages/sucursales/sucursales.module').then( m => m.SucursalesPageModule)
   },
   {
-    path: 'agregar',
-    loadChildren: () => import('./pages/agregar/agregar.module').then( m => m.AgregarPageModule)
+    path: 'especialidades',
+    loadChildren: () => import('./pages/especialidades/especialidades.module').then( m => m.EspecialidadesPageModule)
   },
   {
-    path: 'modificar',
-    loadChildren: () => import('./pages/modificar/modificar.module').then( m => m.ModificarPageModule)
+    path: 'calendario',
+    loadChildren: () => import('./pages/calendario/calendario.module').then( m => m.CalendarioPageModule)
   },
   {
-    path: '**',
-    loadChildren: () => import('./pages/notfound/notfound.module').then( m => m.NotfoundPageModule)
+    path: 'barra',
+    loadChildren: () => import('./pages/barra/barra.module').then( m => m.BarraPageModule)
+  },
+  {
+    path: 'inicio',
+    loadChildren: () => import('./pages/inicio/inicio.module').then( m => m.InicioPageModule)
+  },
+  {
+    path: 'pagina-busqueda',
+    loadChildren: () => import('./pages/pagina-busqueda/pagina-busqueda.module').then( m => m.PaginaBusquedaPageModule)
+  },
+  {
+    path: 'barra-despegable',
+    loadChildren: () => import('./pages/barra-despegable/barra-despegable.module').then( m => m.BarraDespegablePageModule)
+  },
+  {
+    path: 'horario',
+    loadChildren: () => import('./pages/horario/horario.module').then( m => m.HorarioPageModule)
   },
 ];
 

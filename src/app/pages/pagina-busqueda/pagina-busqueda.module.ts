@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { NotfoundPageRoutingModule } from './notfound-routing.module';
+import { PaginaBusquedaPageRoutingModule } from './pagina-busqueda-routing.module';
 
-import { NotfoundPage } from './notfound.page';
+import { PaginaBusquedaPage } from './pagina-busqueda.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    NotfoundPageRoutingModule
+    PaginaBusquedaPageRoutingModule
   ],
-  declarations: [NotfoundPage]
+  declarations: [PaginaBusquedaPage]
 })
-export class NotfoundPageModule {}
+export class PaginaBusquedaPageModule {}

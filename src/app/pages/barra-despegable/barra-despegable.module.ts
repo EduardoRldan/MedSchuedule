@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ModificarPageRoutingModule } from './modificar-routing.module';
+import { BarraDespegablePageRoutingModule } from './barra-despegable-routing.module';
 
-import { ModificarPage } from './modificar.page';
+import { BarraDespegablePage } from './barra-despegable.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ModificarPageRoutingModule
+    BarraDespegablePageRoutingModule
   ],
-  declarations: [ModificarPage]
+  declarations: [BarraDespegablePage]
 })
-export class ModificarPageModule {}
+export class BarraDespegablePageModule {}
