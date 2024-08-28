@@ -1,17 +1,27 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CalendarioPage } from './calendario.page';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-describe('CalendarioPage', () => {
-  let component: CalendarioPage;
-  let fixture: ComponentFixture<CalendarioPage>;
+import { CalendarioPage } from './calendario/calendario.p
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(CalendarioPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
+  },
+  {
+    path: 'calendario',
+    loadChildren: () => import('./calendario/calendario.module').then(m => m.CalendarioPageModule)
+  },
+  // otras rutas
+];
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

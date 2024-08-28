@@ -1,0 +1,28 @@
+ion-grid {
+    --ion-grid-padding: 0;
+  }
+  
+  ion-row {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    background-color: #f9f9f9;
+  }
+  
+  .day:first-child {
+    border-left: none;
+  }
+  
+  .day:last-child {
+    border-right: none;
+  }
+  
