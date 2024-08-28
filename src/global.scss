@@ -39,6 +39,12 @@
 /* Local variables */
 :root {
     --ion-background-color: rgb(228, 244, 255);
+    background-image: url('assets/img/logo-ph.png')
+}
+.img-center {
+    display:block;
+    margin:0 auto;
+    margin-top: 3rem;
 }
 .card {
     display: flex;
