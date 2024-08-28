@@ -3,12 +3,12 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+    path: 'main-login',
+    loadChildren: () => import('./pages/main-login/main-login.module').then( m => m.MainLoginPageModule)
   },
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'main-login',
     pathMatch: 'full'
   },
   {
@@ -30,7 +30,12 @@ const routes: Routes = [
   {
     path: 'barra-despegable',
     loadChildren: () => import('./pages/barra-despegable/barra-despegable.module').then( m => m.BarraDespegablePageModule)
+  },  {
+    path: 'main-page',
+    loadChildren: () => import('./pages/main-page/main-page.module').then( m => m.MainPagePageModule)
   },
+
+
 ];
 
 @NgModule({

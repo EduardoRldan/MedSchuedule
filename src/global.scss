@@ -34,4 +34,25 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/*@import "@ionic/angular/css/palettes/dark.system.css"; */
+
+/* Local variables */
+:root {
+    --ion-background-color: rgb(228, 244, 255);
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+}
+
+.card-title {
+    text-align: center;
+}
+
+.input {
+    --inner-border-width: 0 0 0 0 !important;
+    border-left: 2px solid blue !important;
+    margin-bottom: 1rem;
+}
