@@ -22,6 +22,10 @@
         <ion-item *ngFor="let medico of filteredList">
           <ion-label><b>{{ medico.nombre }}</b></ion-label>
           <ion-label>{{ medico.especialidad }}</ion-label>
+          <ion-button (click)="redirect(medico)" fill="clear" slot="end">
+            <ion-icon name="add-circle-outline"></ion-icon>
+          </ion-button>
+          
         </ion-item>
       </ion-list>
 </ion-content>

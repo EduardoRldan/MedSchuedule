@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-pagina-busqueda',
@@ -59,8 +60,10 @@ export class PaginaBusquedaPage implements OnInit {
     },
   ]
 
+  selectedId : string = "";
+
   filteredList : any;
-  constructor() { }
+  constructor(private router:Router) { }
 
   ngOnInit() {
   }
@@ -79,5 +82,18 @@ export class PaginaBusquedaPage implements OnInit {
       return obj.nombre.toLowerCase().includes(name.toLowerCase());
     });
     this.filteredList = result;
+  }
+
+  redirect(medicObj:any) {
+    let navigationextras : NavigationExtras = {
+      state : {
+        medicObj : medicObj
+      }
+    }
+    this.router.navigate(['/calendario'], navigationextras)
+  }
+
+  testValue(value: any) {
+    console.log(value)
   }
 }
