@@ -11,52 +11,57 @@ export class PaginaBusquedaPage implements OnInit {
   filterSelect : string = "";
   filterName : string = "";
   // Se construye por el momento una lista de médicos que debe incluir los siguientes argumentos
-  // Nombre, Especialidad, Rango de horas (expresado en numeros), hora de inicio, hora de termino
+  // Nombre, Especialidad, rango de duración de cada bloque (en minutos), hora de inicio, hora de termino
   medicList : any = [
     {
       id: 1,
       nombre: "Pedro Pérez Pereira",
       especialidad: "Kinesiología",
       espId : 2,
-      rango: 5,
-      horaInicio: "8:30",
-      horaTermino:"13:30"
+      rango: 30,
+      horaInicio: "08:30",
+      horaTermino:"13:30",
+      fechaCierre : "2024-10-30"
     },
     {
       id: 2,
       nombre: "Juan Cortés Cortés",
       especialidad: "Kinesiología",
       espId : 2,
-      rango: 5,
-      horaInicio: "8:30",
-      horaTermino:"13:30"
+      rango: 30,
+      horaInicio: "08:30",
+      horaTermino:"13:30",
+      fechaCierre : "2024-10-30"
     },
     {
       id: 3,
       nombre: "Roberto González Valenzuela",
       especialidad: "Geriatría",
       espId : 6,
-      rango: 3,
+      rango: 30,
       horaInicio: "10:00",
-      horaTermino:"13:00"
+      horaTermino:"13:00",
+      fechaCierre : "2024-10-30"
     },
     {
       id: 4,
       nombre: "Valeria Martinez Madariaga",
       especialidad: "Medicina General",
       espId : 1,
-      rango: 5,
-      horaInicio: "8:30",
-      horaTermino:"13:30"
+      rango: 30,
+      horaInicio: "08:30",
+      horaTermino:"13:30",
+      fechaCierre : "2024-10-30"
     },
     {
       id: 5,
       nombre: "Elena Vásquez Muñoz",
       especialidad: "Oncología",
       espId : 5,
-      rango: 5,
-      horaInicio: "8:30",
-      horaTermino:"13:30"
+      rango: 30,
+      horaInicio: "08:30",
+      horaTermino:"13:30",
+      fechaCierre : "2024-10-30"
     },
   ]
 
@@ -91,9 +96,5 @@ export class PaginaBusquedaPage implements OnInit {
       }
     }
     this.router.navigate(['/calendario'], navigationextras)
-  }
-
-  testValue(value: any) {
-    console.log(value)
   }
 }

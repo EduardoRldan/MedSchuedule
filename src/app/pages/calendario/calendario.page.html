@@ -8,5 +8,19 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
+  <ion-card class="card" style="min-height:5rem;">
+    <ion-card-title class="card-title">{{ medicObj.nombre }}</ion-card-title>
+    <ion-card-subtitle>{{ medicObj.especialidad }}</ion-card-subtitle>
+    <p>{{ selectedDate }}</p>
+  </ion-card>
+  <ion-card class="card">
+    <ion-card-content>
+      <ion-datetime
+      [(ngModel)]="selectedDate" 
+      presentation="date" 
+      min="{{ minDate }}" 
+      max="{{ maxDate }}"
+      (ionChange)="populateHourList(selectedDate, medicObj.rango, medicObj.horaInicio)"></ion-datetime>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-page',
@@ -7,9 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MainPagePage implements OnInit {
   date : number = Date.now();
-  constructor() { }
+  constructor(private router:Router) { }
 
   ngOnInit() {
   }
-
+  goToPage(route:string){
+    this.router.navigate([route]);
+  }
 }
