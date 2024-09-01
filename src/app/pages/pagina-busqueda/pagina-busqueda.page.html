@@ -18,7 +18,7 @@
         <ion-select-option value="6">Geriatría</ion-select-option>
       </ion-select>
       <ion-searchbar [(ngModel)]="filterName" (ionChange)="filterByName(filterName)" placeholder="Buscar por Médico"></ion-searchbar>
-      <ion-list lines="full">
+      <ion-list lines="full" *ngIf="filteredList">
         <ion-item *ngFor="let medico of filteredList">
           <ion-label><b>{{ medico.nombre }}</b></ion-label>
           <ion-label>{{ medico.especialidad }}</ion-label>

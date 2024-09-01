@@ -11,7 +11,6 @@
   <ion-card class="card" style="min-height:5rem;">
     <ion-card-title class="card-title">{{ medicObj.nombre }}</ion-card-title>
     <ion-card-subtitle>{{ medicObj.especialidad }}</ion-card-subtitle>
-    <p>{{ selectedDate }}</p>
   </ion-card>
   <ion-card class="card">
     <ion-card-content>
@@ -20,7 +19,32 @@
       presentation="date" 
       min="{{ minDate }}" 
       max="{{ maxDate }}"
-      (ionChange)="populateHourList(selectedDate, medicObj.rango, medicObj.horaInicio)"></ion-datetime>
+      (ionChange)="populateHourList(selectedDate, medicObj)"></ion-datetime>
     </ion-card-content>
   </ion-card>
+  <ion-list *ngIf="hideList==false" lines="full">
+    <ion-list-header>
+      <h3>{{dateStr}}</h3>
+    </ion-list-header>
+    <ion-item *ngFor="let block of hourList; index as i">
+      <!-- <ion-label>{{block.hora}}</ion-label>
+      <ion-label>Disponible</ion-label>
+      <ion-button (click)="confirmAlert(dateStr,block.hora)" fill="clear" slot="end">
+        <ion-icon name="add-circle-outline"></ion-icon>
+      </ion-button> -->
+      <div *ngIf="block.disponible==true; then bloqueLibre else bloqueOcupado"></div>
+        <ng-template #bloqueLibre>
+          <ion-label>{{block.hora}}</ion-label>
+          <ion-label>Disponible</ion-label>
+          <ion-button (click)="confirmAlert(dateStr,block.hora)" fill="clear" slot="end">
+            <ion-icon name="add-circle-outline"></ion-icon>
+          </ion-button>
+        </ng-template>
+        <ng-template #bloqueOcupado>
+          <ion-label>{{block.hora}}</ion-label>
+          <ion-label>Ocupado</ion-label>
+          <ion-icon slot="end" name="close-outline"></ion-icon>
+        </ng-template>
+    </ion-item>
+  </ion-list>
 </ion-content>

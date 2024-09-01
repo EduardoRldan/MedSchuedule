@@ -12,13 +12,14 @@ export class PaginaBusquedaPage implements OnInit {
   filterName : string = "";
   // Se construye por el momento una lista de médicos que debe incluir los siguientes argumentos
   // Nombre, Especialidad, rango de duración de cada bloque (en minutos), hora de inicio, hora de termino
+  medList : any;
   medicList : any = [
     {
       id: 1,
       nombre: "Pedro Pérez Pereira",
       especialidad: "Kinesiología",
       espId : 2,
-      rango: 30,
+      rango: 15,
       horaInicio: "08:30",
       horaTermino:"13:30",
       fechaCierre : "2024-10-30"
@@ -28,7 +29,7 @@ export class PaginaBusquedaPage implements OnInit {
       nombre: "Juan Cortés Cortés",
       especialidad: "Kinesiología",
       espId : 2,
-      rango: 30,
+      rango: 15,
       horaInicio: "08:30",
       horaTermino:"13:30",
       fechaCierre : "2024-10-30"
@@ -38,7 +39,7 @@ export class PaginaBusquedaPage implements OnInit {
       nombre: "Roberto González Valenzuela",
       especialidad: "Geriatría",
       espId : 6,
-      rango: 30,
+      rango: 60,
       horaInicio: "10:00",
       horaTermino:"13:00",
       fechaCierre : "2024-10-30"
@@ -71,10 +72,15 @@ export class PaginaBusquedaPage implements OnInit {
   constructor(private router:Router) { }
 
   ngOnInit() {
+    fetch('./assets/json/medicList.json')
+    .then(res => res.json())
+    .then(json => {
+      this.medList = json;
+    })
   }
   
   filterBySpeciality(speciality:string) {
-    let list = this.medicList;
+    let list = this.medList;
     const result = list.filter((obj: any) =>{
       return obj.espId === parseInt(speciality);
     });
@@ -82,7 +88,7 @@ export class PaginaBusquedaPage implements OnInit {
   }
 
   filterByName(name:string) {
-    let list = this.medicList;
+    let list = this.medList;
     const result = list.filter((obj:any) => {
       return obj.nombre.toLowerCase().includes(name.toLowerCase());
     });
