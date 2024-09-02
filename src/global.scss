@@ -44,19 +44,18 @@
 */
 ion-content {
     --background : none;
-    background-image: url("assets/img/logo-ph.png");
+    background-image: url("assets/img/medsch.png");
     background-color:rgb(234, 234, 234);
     background-repeat: no-repeat;
     background-position: right bottom;
-    background-position-x: 8rem;
-    background-size: 120%;
+    background-size : 20rem;
 
     
 }
 
 ion-header {
     --ion-background-color : none;
-    background-color: rgb(45, 45, 151);
+    background-color: rgb(47, 105, 147);
 }
 
 ion-title {
@@ -76,34 +75,36 @@ ion-datetime {
     margin : 0 auto;
 }
 .content-txt {
-    margin-left:1rem;
-    margin-right:1rem;
-    margin-top:2rem;
-    margin-bottom:2rem;
+    color:rgb(47, 105, 147);
+    margin-left:1rem !important;
+    margin-right:1rem !important;
+    margin-top:2rem !important;
+    margin-bottom:1rem !important;
 }
 .img-center {
     display:block;
     margin:0 auto;
     margin-top: 5rem;
+    max-width:15rem;
 }
 .card {
     display: flex;
     flex-direction: column;
     align-items:center;
     justify-content:center;
-    background-color:rgb(231, 242, 255);
+    background-color:rgb(243, 250, 255);
 }
 
 .card-title {
     text-align: center;
     font-weight: 600;
-    color:rgb(45, 45, 151);
+    color:rgb(47, 105, 147);
 }
 
 .input {
     --inner-border-width: 0 0 0 0 !important;
     background-color : #fff;
-    border-left: 2px solid rgb(45, 45, 151);
+    border-left: 2px solid rgb(47, 105, 147);
     margin-bottom: 1rem;
 }
 
@@ -113,7 +114,7 @@ ion-datetime {
     margin-left:2rem;
     margin-right:2rem;
     margin-bottom:1rem;
-    --background:rgb(45, 45, 151);
+    --background:rgb(47, 105, 147);
 }
 
 ion-list {

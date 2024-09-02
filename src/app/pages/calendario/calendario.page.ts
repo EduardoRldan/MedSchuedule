@@ -9,6 +9,7 @@ import { AlertController } from '@ionic/angular';
 })
 export class CalendarioPage implements OnInit {
   medicObj : any;
+  user : any;
   today = new Date(Date.now())
   year = this.today.getFullYear();
   month = this.today.getMonth() + 1;  // estrictamente necesario que sume uno más al mes
@@ -28,6 +29,7 @@ export class CalendarioPage implements OnInit {
     this.activatedroute.queryParams.subscribe( param => {
       if(this.router.getCurrentNavigation()?.extras.state){
         this.medicObj = this.router.getCurrentNavigation()?.extras?.state?.['medicObj'];
+        this.user = this.router.getCurrentNavigation()?.extras?.state?.['user'];
       }
     });
   }
@@ -135,7 +137,7 @@ export class CalendarioPage implements OnInit {
     this.hideList=false;
   }
 
-  async confirmAlert(day : string, hour : string){
+  async confirmAlert(day : string, hour : string, medicName : string){
     const alert = await this.alertController.create(
       {
         header : "Confirmar Hora",
@@ -149,13 +151,13 @@ export class CalendarioPage implements OnInit {
           text : "Confirmar",
           role : "confirm",
           handler : ()=>{
-            this.saveDate();
+            this.saveDate(day, hour, medicName);
           }
         }]
       });
     await alert.present();
   }
-  async saveDate(){
+  async saveDate(svDay : string, svHr : string, medicName : string){
     const alert = await this.alertController.create(
       {
         header : "Su hora ha sido confirmada",
@@ -165,9 +167,16 @@ export class CalendarioPage implements OnInit {
     );
     await alert.present();
     let navigationextras : NavigationExtras = {
-      state :
+      state : {
+        dateSaved : {
+          day : svDay,
+          hour : svHr,
+          medic : medicName
+        },
+        user : this.user
+      }
     }
-    this.router.navigate(['/main-page']);
+    this.router.navigate(['/main-page'], navigationextras);
     this.selectedDate = "";
   }
 }

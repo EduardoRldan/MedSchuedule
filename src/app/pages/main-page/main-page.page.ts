@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-page',
@@ -8,11 +8,35 @@ import { Router } from '@angular/router';
 })
 export class MainPagePage implements OnInit {
   date : number = Date.now();
-  constructor(private router:Router) { }
+  user : any;
+  setHours : any = [];
+  constructor(private router:Router, private activatedroute : ActivatedRoute) { 
+    this.activatedroute.queryParams.subscribe( param => {
+      if (this.router.getCurrentNavigation()?.extras.state) {
+        this.user = this.router.getCurrentNavigation()?.extras?.state?.['user']
+        if (this.router.getCurrentNavigation()?.extras?.state?.['dateSaved']){
+          this.setHours.push(this.router.getCurrentNavigation()?.extras?.state?.['dateSaved'])
+        }
+      }
+    })
+  }
 
   ngOnInit() {
   }
   goToPage(route:string){
-    this.router.navigate([route]);
+    let navExtras : NavigationExtras = {
+      state : {
+        user : this.user
+      }
+    }
+    this.router.navigate([route],navExtras);
+  }
+  goToSchedule(route : string,hourList : any){
+    let navExtras : NavigationExtras = {
+      state : {
+        list : hourList
+      }
+    }
+    this.router.navigate([route],navExtras);
   }
 }

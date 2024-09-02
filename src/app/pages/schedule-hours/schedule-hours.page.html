@@ -1,0 +1,19 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Horas Agendadas</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button color="light"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h6 class="content-txt">Aquí puede encontrar sus consultas médicas agendadas.</h6>
+  <ion-list lines="full" *ngIf="hideList== false">
+    <ion-item *ngFor="let hr of setHours">
+      <ion-label><b>{{hr.day}}</b></ion-label>
+      <ion-label>{{hr.hour}}hrs.</ion-label>
+      <ion-label>Dr. {{hr.medic}}</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

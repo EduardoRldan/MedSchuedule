@@ -22,7 +22,19 @@ const routes: Routes = [
   {
     path: 'main-page',
     loadChildren: () => import('./pages/main-page/main-page.module').then( m => m.MainPagePageModule)
+  },  {
+    path: 'signup',
+    loadChildren: () => import('./pages/signup/signup.module').then( m => m.SignupPageModule)
   },
+  {
+    path: 'schedule-hours',
+    loadChildren: () => import('./pages/schedule-hours/schedule-hours.module').then( m => m.ScheduleHoursPageModule)
+  },
+  {
+    path: 'forgot-password',
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
+  },
+
 
 ];
 

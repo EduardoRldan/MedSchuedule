@@ -5,25 +5,25 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <img class="img-center" src="assets/img/logo-ph.png" alt="">
+  <img class="img-center" src="assets/img/medsch-logo.png" alt="">
   <ion-card class="card">
-    <ion-card-header>
+    <!-- <ion-card-header>
       <ion-card-title class="card-title">Iniciar Sesión</ion-card-title>
-    </ion-card-header>
+    </ion-card-header> -->
 
     <ion-card-content>
       <ion-item class="input">
         <ion-icon slot="start" name="mail-outline"></ion-icon>
-        <ion-input label="E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
+        <ion-input [(ngModel)]="mail" label="E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
       </ion-item>
       <ion-item class="input">
         <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
-        <ion-input label="Contraseña" type="password" labelPlacement="floating" placeholder="Inserte su contraseña"></ion-input>
+        <ion-input [(ngModel)]="pw" label="Contraseña" type="password" labelPlacement="floating" placeholder="Inserte su contraseña"></ion-input>
         <ion-icon slot="end" name="eye-outline"></ion-icon>
       </ion-item>
-      <ion-button class="btn">Iniciar Sesión</ion-button>
-      <ion-button class="btn">Registrarse</ion-button>
+      <ion-button class="btn" (click)="login(mail, pw)">Iniciar Sesión</ion-button>
+      <ion-button class="btn" (click)="signup()">Registrarse</ion-button>
     </ion-card-content>
   </ion-card>
-  <p class="forgot-pass">Olvidé mi contraseña</p>
+  <ion-button (click)="forgotPassword()" class="btn">Olvidé mi contraseña</ion-button>
 </ion-content>

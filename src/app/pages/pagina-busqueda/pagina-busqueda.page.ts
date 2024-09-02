@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationExtras, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-pagina-busqueda',
@@ -7,7 +7,7 @@ import { NavigationExtras, Router } from '@angular/router';
   styleUrls: ['./pagina-busqueda.page.scss'],
 })
 export class PaginaBusquedaPage implements OnInit {
-
+  user : any;
   filterSelect : string = "";
   filterName : string = "";
   // Se construye por el momento una lista de médicos que debe incluir los siguientes argumentos
@@ -69,7 +69,13 @@ export class PaginaBusquedaPage implements OnInit {
   selectedId : string = "";
 
   filteredList : any;
-  constructor(private router:Router) { }
+  constructor(private router:Router, private activatedroute : ActivatedRoute) { 
+    this.activatedroute.queryParams.subscribe( param => {
+      if (this.router.getCurrentNavigation()?.extras.state) {
+        this.user = this.router.getCurrentNavigation()?.extras?.state?.['user']
+      }
+    })
+  }
 
   ngOnInit() {
     fetch('./assets/json/medicList.json')
@@ -98,7 +104,8 @@ export class PaginaBusquedaPage implements OnInit {
   redirect(medicObj:any) {
     let navigationextras : NavigationExtras = {
       state : {
-        medicObj : medicObj
+        medicObj : medicObj,
+        user : this.user
       }
     }
     this.router.navigate(['/calendario'], navigationextras)

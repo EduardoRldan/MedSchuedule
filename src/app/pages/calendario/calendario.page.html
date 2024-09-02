@@ -36,7 +36,7 @@
         <ng-template #bloqueLibre>
           <ion-label>{{block.hora}}</ion-label>
           <ion-label>Disponible</ion-label>
-          <ion-button (click)="confirmAlert(dateStr,block.hora)" fill="clear" slot="end">
+          <ion-button (click)="confirmAlert(dateStr,block.hora, medicObj.nombre)" fill="clear" slot="end">
             <ion-icon name="add-circle-outline"></ion-icon>
           </ion-button>
         </ng-template>

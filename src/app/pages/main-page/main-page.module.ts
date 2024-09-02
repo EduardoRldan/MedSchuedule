@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { MainPagePageRoutingModule } from './main-page-routing.module';
 
 import { MainPagePage } from './main-page.page';
+import { FooterMenuComponent } from 'src/app/components/footer-menu/footer-menu.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { MainPagePage } from './main-page.page';
     IonicModule,
     MainPagePageRoutingModule
   ],
-  declarations: [MainPagePage]
+  declarations: [MainPagePage,FooterMenuComponent]
 })
 export class MainPagePageModule {}
