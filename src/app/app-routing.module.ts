@@ -34,6 +34,14 @@ const routes: Routes = [
     path: 'forgot-password',
     loadChildren: () => import('./pages/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
   },
+  {
+    path: 'main-page-medic',
+    loadChildren: () => import('./pages/main-page-medic/main-page-medic.module').then( m => m.MainPageMedicPageModule)
+  },
+  {
+    path: 'medic-hours',
+    loadChildren: () => import('./pages/medic-hours/medic-hours.module').then( m => m.MedicHoursPageModule)
+  },
 
 
 ];

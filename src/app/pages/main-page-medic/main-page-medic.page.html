@@ -1,0 +1,25 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Panel de Médico</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title class="card-title">Bienvenido, Dr. </ion-card-title>
+      <ion-card-subtitle>{{date | date :'MMMM d, YYYY - h:mm'}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content *ngFor="let hr of todayAgenda">
+      <ng-container *ngIf="todayAgenda.length != 0">
+        <ion-label>Something</ion-label>
+      </ng-container>
+    </ion-card-content>
+    <ion-card-content *ngIf="todayAgenda.length == 0">
+      <ion-label>No tiene pacientes hoy</ion-label>
+    </ion-card-content>
+  </ion-card>
+  <ion-button class="btn">Ver todas las horas agendadas</ion-button>
+  <ion-button class="btn">Configurar Horarios de Atención</ion-button>
+  <ion-button class="btn">Cerrar Atenciones de hoy</ion-button>
+</ion-content>
