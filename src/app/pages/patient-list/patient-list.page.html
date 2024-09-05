@@ -1,0 +1,24 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button color="light"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Lista de Pacientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list lines="full">
+    <ion-item *ngIf="patientList.length == 0">
+      <ion-label>No tiene pacientes</ion-label>
+    </ion-item>
+    <ng-container *ngIf="patientList.length !=0">
+      <ion-item *ngFor="let patient of patientList">
+        <ion-label slot="start">01/01/2024</ion-label>
+        <ion-label>Nombre Paciente</ion-label>
+        <ion-icon name="add-circle-outline"></ion-icon>
+      </ion-item>
+    </ng-container>
+    
+  </ion-list>
+</ion-content>

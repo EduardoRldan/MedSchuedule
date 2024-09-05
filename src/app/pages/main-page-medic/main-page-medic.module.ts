@@ -11,6 +11,7 @@ import { MainPageMedicPage } from './main-page-medic.page';
 import { registerLocaleData } from '@angular/common';
 
 import localeEs from '@angular/common/locales/es-CL';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 registerLocaleData(localeEs, 'es');
 @NgModule({
@@ -18,9 +19,12 @@ registerLocaleData(localeEs, 'es');
     CommonModule,
     FormsModule,
     IonicModule,
-    MainPageMedicPageRoutingModule
+    MainPageMedicPageRoutingModule,
+    ComponentsModule
   ],
-  declarations: [MainPageMedicPage],
+  declarations: [
+    MainPageMedicPage
+  ],
   providers : [{ provide : LOCALE_ID, useValue : 'es'}]
 })
 export class MainPageMedicPageModule {}

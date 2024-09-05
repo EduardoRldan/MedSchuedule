@@ -42,6 +42,14 @@ const routes: Routes = [
     path: 'medic-hours',
     loadChildren: () => import('./pages/medic-hours/medic-hours.module').then( m => m.MedicHoursPageModule)
   },
+  {
+    path: 'patient-list',
+    loadChildren: () => import('./pages/patient-list/patient-list.module').then( m => m.PatientListPageModule)
+  },
+  {
+    path: 'patient-config',
+    loadChildren: () => import('./pages/patient-config/patient-config.module').then( m => m.PatientConfigPageModule)
+  },
 
 
 ];
