@@ -36,7 +36,7 @@ export class MainLoginPage implements OnInit {
           user : this.dummyUser
         }
       }
-      this.router.navigate(['/main-page'], navExtras)
+      this.router.navigate(['/tab-paciente'], navExtras)
     }
   }
   signup () {

@@ -49,8 +49,6 @@ ion-content {
     background-repeat: no-repeat;
     background-position: right bottom;
     background-size : 20rem;
-
-    
 }
 
 ion-header {
@@ -62,17 +60,21 @@ ion-title {
     color:#fff;
 }
 
-ion-select {
-    margin:0 auto;
-    max-width:95%;
-    padding-left:1rem;
-    padding-right:1rem;
-    --ion-background-color:none;
-    background-color:#fff;
-}
+// ion-select {
+//     margin:0 auto;
+//     max-width:95%;
+//     padding-left:1rem;
+//     padding-right:1rem;
+//     --ion-background-color:none;
+//     background-color:#fff;
+// }
 
 ion-datetime {
     margin : 0 auto;
+}
+ion-item {
+    max-width:300px;
+    min-width:300px;
 }
 .content-txt {
     color:rgb(47, 105, 147);
@@ -121,4 +123,14 @@ ion-list {
     margin:0 auto !important;
     margin-top:2rem !important;
     max-width:95%;
+}
+ion-tab-bar {
+    --background: rgb(47, 105, 147);
+}
+
+ion-tab-button {
+    --color:rgb(201, 230, 251);
+    --color-selected:white;
+    --ripple-color: white;
+    --padding-top:0.5 rem;
 }

@@ -8,7 +8,7 @@
   <ion-card>
     <ion-card-header>
       <ion-card-title class="card-title">Bienvenido, Dr. </ion-card-title>
-      <ion-card-subtitle>{{date | date :'MMMM d, YYYY - h:mm'}}</ion-card-subtitle>
+      <ion-card-subtitle>{{date | date :'MMMM d, YYYY'}}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content *ngFor="let hr of todayAgenda">
       <ng-container *ngIf="todayAgenda.length != 0">
@@ -19,7 +19,7 @@
       <ion-label>No tiene pacientes hoy</ion-label>
     </ion-card-content>
   </ion-card>
-  <app-btn-router page="/patient-list" label="Ver Todas las horas agendadas"></app-btn-router>
-  <app-btn-router page="/medic-hours" label="Configurar Horarios de Atención"></app-btn-router>
+  <app-btn-router page="/tab-medico/patient-list" label="Ver Todas las horas agendadas"></app-btn-router>
+  <app-btn-router page="/tab-medico/medic-hours" label="Configurar Horarios de Atención"></app-btn-router>
   <ion-button class="btn">Cerrar Atenciones de hoy</ion-button>
 </ion-content>

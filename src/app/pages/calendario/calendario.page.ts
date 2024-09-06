@@ -176,7 +176,7 @@ export class CalendarioPage implements OnInit {
         user : this.user
       }
     }
-    this.router.navigate(['/main-page'], navigationextras);
+    this.router.navigate(['/tab-paciente/main-page'], navigationextras);
     this.selectedDate = "";
   }
 }

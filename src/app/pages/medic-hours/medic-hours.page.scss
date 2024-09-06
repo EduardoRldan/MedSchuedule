@@ -3,9 +3,9 @@
     flex-direction:row;
     align-items:center;
 }
-#time-button {
-    background-color:white;
+ion-datetime-button button {
+    --background:white;
 }
-ion-select {
-    max-width:100%;
-}
+// ion-select {
+//     max-width:100%;
+// }

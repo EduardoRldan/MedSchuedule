@@ -1,3 +1,19 @@
+<!-- 
+MODO DE USO
+Reemplaza el botón para navegar entre páginas
+permite colocar iconos al principio
+también permmite enviar datos entre paginas
+
+TAG : <app-btn-router label="" page="" icon="" [dataToSend]=""></app-btn-router>
+
+ATRIBUTOS:
+  - label : string. Es el texto que tendrá el botón, si queda vacío no mostrará ningun texto
+  - page : string. Direccion de la página a la cual dirigirá el botón Ej. '/pagina'
+  - icon (opcional) : string. Renderiza un icono que aparecerá en el inicio del botón. Por defecto no muestra nada.
+  - [dataToSend] (opcional) : any. Utiliza el metodo de NavigationExtras para enviar objetos hacia otra página que 
+  permite recibirlo. Si no se usan los corchetes enviará un string.
+-->
+
 <ion-button (click)="goToPage(page)" class="btn">
   <ion-icon *ngIf="iconPresent" slot="start" [name]="icon"></ion-icon>
   {{ label }}

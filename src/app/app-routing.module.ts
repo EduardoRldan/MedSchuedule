@@ -50,6 +50,18 @@ const routes: Routes = [
     path: 'patient-config',
     loadChildren: () => import('./pages/patient-config/patient-config.module').then( m => m.PatientConfigPageModule)
   },
+  {
+    path: 'tab-paciente',
+    loadChildren: () => import('./pages/tab-paciente/tab-paciente.module').then( m => m.TabPacientePageModule)
+  },
+  {
+    path: 'tab-medico',
+    loadChildren: () => import('./pages/tab-medico/tab-medico.module').then( m => m.TabMedicoPageModule)
+  },
+  {
+    path: 'user-profile',
+    loadChildren: () => import('./pages/user-profile/user-profile.module').then( m => m.UserProfilePageModule)
+  },
 
 
 ];

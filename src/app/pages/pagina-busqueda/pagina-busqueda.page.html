@@ -1,7 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button color="light"></ion-back-button>
+      <!-- <ion-back-button color="light"></ion-back-button> -->
+      <app-btn-back page="/tab-paciente/main-page"></app-btn-back>
     </ion-buttons>
     <ion-title>Agendar Hora</ion-title>
   </ion-toolbar>
@@ -23,7 +24,7 @@
           <ion-label><b>{{ medico.nombre }}</b></ion-label>
           <ion-label>{{ medico.especialidad }}</ion-label>
           <ion-button (click)="redirect(medico)" fill="clear" slot="end">
-            <ion-icon name="add-circle-outline"></ion-icon>
+            <ion-icon size="large" name="add-circle-outline"></ion-icon>
           </ion-button>
           
         </ion-item>

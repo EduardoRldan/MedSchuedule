@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button color="light"></ion-back-button>
+      <app-btn-back page="/tab-medico/main-page-medic"></app-btn-back>
     </ion-buttons>
     <ion-title>Lista de Pacientes</ion-title>
   </ion-toolbar>
@@ -16,7 +16,9 @@
       <ion-item *ngFor="let patient of patientList">
         <ion-label slot="start">01/01/2024</ion-label>
         <ion-label>Nombre Paciente</ion-label>
-        <ion-icon name="add-circle-outline"></ion-icon>
+        <ion-button fill="clear" (click)="goToPatient('/tab-medico/patient-config', selectedPatient)">
+          <ion-icon size="large" name="add-circle-outline"></ion-icon>
+        </ion-button>
       </ion-item>
     </ng-container>
     

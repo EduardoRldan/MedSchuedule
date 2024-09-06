@@ -1,0 +1,75 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Perfil Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Datos Personales</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form action="">
+        <ion-item class="input">
+          <ion-input type="text" label="Primer Nombre" labelPlacement="floating" value="Primer Nombre"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="text" label="Segundo Nombre" labelPlacement="floating" value="Segundo Nombre"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="text" label="Apellido Paterno" labelPlacement="floating" value="APaterno"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="text" label="Apellido Materno" labelPlacement="floating" value="AMaterno"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="text" label="RUN/DNI" labelPlacement="floating" value="11222333-4"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="phone" label="Télefono" labelPlacement="floating" value="123456789"></ion-input>
+        </ion-item>
+        <ion-button class="btn" type="submit">Guardar Datos</ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Cambiar dirección de E-mail</ion-card-title>
+      <ion-card-subtitle>Se enviará una notificación a su dirección anterior y a su correo nuevo para confirmar el cambio</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <form action="">
+        <ion-item class="input">
+          <ion-icon slot="start" name="mail-outline"></ion-icon>
+          <ion-input type="email" label="Inserte Nuevo E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>      
+        </ion-item>
+        <ion-button class="btn" type="submit">Cambiar E-mail</ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Cambiar Contraseña</ion-card-title>
+      <ion-card-subtitle>Ingrese su actual contraseña y la nueva que desea cambiar. Al hacerlo se cerrará la sesión y tendrá que ingresar con su nueva contraseña</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <form action="">
+        <ion-item class="input">
+          <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+          <ion-input type="password" label="Contraseña Actual" labelPlacement="floating"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="password" label="Contraseña Nueva" labelPlacement="floating"></ion-input>
+        </ion-item>
+        <ion-item class="input">
+          <ion-input type="password" label="Repetir Contraseña" labelPlacement="floating"></ion-input>
+        </ion-item>
+        <ion-button class="btn" type="submit">Cambiar Contraseña</ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+  <ion-button class="btn">
+    <ion-icon size="large" slot="start" name="log-out-outline"></ion-icon>
+    Cerrar Sesión</ion-button>
+</ion-content>

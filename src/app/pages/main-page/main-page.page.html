@@ -26,7 +26,7 @@
     </ion-card-content>
     <ion-card-content><ion-label *ngIf="setHours.length == 0">No tiene horas agendadas</ion-label></ion-card-content>
   </ion-card>
-  <app-btn-router page="/pagina-busqueda" label="Agendar Hora Médica" icon="calendar-number-outline"></app-btn-router>
+  <app-btn-router page="/tab-paciente/pagina-busqueda" label="Agendar Hora Médica" icon="calendar-number-outline"></app-btn-router>
   <app-btn-router page="/schedule-hours" [dataToSend]="setHours" label="Ver Horas Agendadas" icon="alarm-outline"></app-btn-router>
   <!-- <ion-button class="btn" (click)="goToPage('/pagina-busqueda')">
     <ion-icon slot="start" name="calendar-number-outline"></ion-icon>

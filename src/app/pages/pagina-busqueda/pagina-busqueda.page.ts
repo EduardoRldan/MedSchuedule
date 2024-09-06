@@ -108,6 +108,6 @@ export class PaginaBusquedaPage implements OnInit {
         user : this.user
       }
     }
-    this.router.navigate(['/calendario'], navigationextras)
+    this.router.navigate(['/tab-paciente/calendario'], navigationextras)
   }
 }

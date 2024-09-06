@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { CalendarioPageRoutingModule } from './calendario-routing.module';
+import { TabPacientePageRoutingModule } from './tab-paciente-routing.module';
 
-import { CalendarioPage } from './calendario.page';
+import { TabPacientePage } from './tab-paciente.page';
 import { ComponentsModule } from 'src/app/components/components.module';
 
 @NgModule({
@@ -14,9 +14,9 @@ import { ComponentsModule } from 'src/app/components/components.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    CalendarioPageRoutingModule,
+    TabPacientePageRoutingModule,
     ComponentsModule
   ],
-  declarations: [CalendarioPage]
+  declarations: [TabPacientePage]
 })
-export class CalendarioPageModule {}
+export class TabPacientePageModule {}

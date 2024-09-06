@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient-list',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PatientListPage implements OnInit {
   patientList : any = [1];
-  constructor() { }
+  selectedPatient : any;
+  constructor(private router:Router) { }
 
   ngOnInit() {
   }
 
+  goToPatient(page : string, patient : any){
+    let navExtras : NavigationExtras = {
+      state : {
+        patient : patient
+      }
+    }
+    this.router.navigate([page], navExtras)
+  }
 }
