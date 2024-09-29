@@ -62,6 +62,10 @@ const routes: Routes = [
     path: 'user-profile',
     loadChildren: () => import('./pages/user-profile/user-profile.module').then( m => m.UserProfilePageModule)
   },
+  {
+    path: 'medic-post-login',
+    loadChildren: () => import('./pages/medic-post-login/medic-post-login.module').then( m => m.MedicPostLoginPageModule)
+  },
 
 
 ];

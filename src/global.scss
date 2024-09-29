@@ -134,3 +134,17 @@ ion-tab-button {
     --ripple-color: white;
     --padding-top:0.5 rem;
 }
+
+.item-list {
+    max-width:100%;
+}
+
+.center-block {
+    height:100%;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}

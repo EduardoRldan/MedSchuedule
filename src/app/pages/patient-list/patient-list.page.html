@@ -13,7 +13,7 @@
       <ion-label>No tiene pacientes</ion-label>
     </ion-item>
     <ng-container *ngIf="patientList.length !=0">
-      <ion-item *ngFor="let patient of patientList">
+      <ion-item class="item-list" *ngFor="let patient of patientList">
         <ion-label slot="start">01/01/2024</ion-label>
         <ion-label>Nombre Paciente</ion-label>
         <ion-button fill="clear" (click)="goToPatient('/tab-medico/patient-config', selectedPatient)">

@@ -1,0 +1,22 @@
+<ion-header [translucent]="true">
+
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="center-block">
+    <ion-card class="card">
+      <ion-card-header>
+        <ion-card-title class="card-title">¿Cómo desea entrar?</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <app-btn-router page="/tab-medico" label="Entrar como Médico" icon="medical-outline"></app-btn-router>
+        <app-btn-router page="/tab-paciente" label="Entrar como Paciente" icon="person-outline"></app-btn-router>
+        <ion-button class="btn">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Cerrar Sesión
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  
+</ion-content>

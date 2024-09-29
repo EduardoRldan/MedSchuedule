@@ -9,18 +9,29 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-<h6 class="content-txt">Seleccione la Especialidad o puede buscar por el nombre de su médico.</h6>
-      <ion-select [(ngModel)]="filterSelect" (ionChange)="filterBySpeciality(filterSelect)" placeholder="Buscar por Especialidad">
-        <ion-select-option value="1">Medicina General</ion-select-option>
-        <ion-select-option value="2">Kinesiología</ion-select-option>
-        <ion-select-option value="3">Traumatología</ion-select-option>
-        <ion-select-option value="4">Pediatría</ion-select-option>
-        <ion-select-option value="5">Oncología</ion-select-option>
-        <ion-select-option value="6">Geriatría</ion-select-option>
-      </ion-select>
-      <ion-searchbar [(ngModel)]="filterName" (ionChange)="filterByName(filterName)" placeholder="Buscar por Médico"></ion-searchbar>
+  
+  <h6 class="content-txt">Seleccione la Especialidad o puede buscar por el nombre de su médico.</h6>
+  <ion-card class="card">
+    <ion-card-content>
+      <ion-item class="input">
+        <ion-select [(ngModel)]="filterSelect" (ionChange)="filterBySpeciality(filterSelect)" placeholder="Buscar por Especialidad">
+          <ion-select-option value="1">Medicina General</ion-select-option>
+          <ion-select-option value="2">Kinesiología</ion-select-option>
+          <ion-select-option value="3">Traumatología</ion-select-option>
+          <ion-select-option value="4">Pediatría</ion-select-option>
+          <ion-select-option value="5">Oncología</ion-select-option>
+          <ion-select-option value="6">Geriatría</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item class="input">
+        <ion-input [(ngModel)]="filterName" (change)="filterByName(filterName)" type="text" label="Buscar por médico" labelPlacement="floating"></ion-input>
+      </ion-item>
+      <!-- <ion-searchbar [(ngModel)]="filterName" (ionChange)="filterByName(filterName)" placeholder="Buscar por Médico"></ion-searchbar> -->
+    </ion-card-content>
+  </ion-card>
+      
       <ion-list lines="full" *ngIf="filteredList">
-        <ion-item *ngFor="let medico of filteredList">
+        <ion-item class="item-list" *ngFor="let medico of filteredList">
           <ion-label><b>{{ medico.nombre }}</b></ion-label>
           <ion-label>{{ medico.especialidad }}</ion-label>
           <ion-button (click)="redirect(medico)" fill="clear" slot="end">

@@ -12,117 +12,104 @@
   <!-- Horas Laborales -->
   <ion-card class="card">
     <ion-card-header>
-      <ion-card-title class="card-title">Configurar Horas de Inicio y Salida</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="content-flex">
-      <ion-label>Hora Inicio</ion-label>
-      <ion-datetime-button datetime="startHr" style="margin-right:0.5rem;"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime presentation="time" id="startHr"></ion-datetime>
-        </ng-template>
-      </ion-modal>
-
-      <ion-label>Hora Término</ion-label>
-      <ion-datetime-button datetime="endHr"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime presentation="time" id="endHr"></ion-datetime>
-        </ng-template>
-      </ion-modal>
-    </ion-card-content>
-  <!-- Descanso -->
-
-    <ion-card-header>
-      <ion-card-title class="card-title">Horas de Descanso</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="content-flex">
-      <ion-label>Hora Inicio</ion-label>
-      <ion-datetime-button datetime="startHrBreak" style="margin-right:0.5rem;"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime presentation="time" id="startHrBreak"></ion-datetime>
-        </ng-template>
-      </ion-modal>
-
-    <ion-label>Hora Término</ion-label>
-    <ion-datetime-button datetime="endHrBreak"></ion-datetime-button>
-    <ion-modal [keepContentsMounted]="true">
-      <ng-template>
-        <ion-datetime presentation="time" id="endHrBreak"></ion-datetime>
-      </ng-template>
-    </ion-modal>
-    </ion-card-content>
-<!-- Dias Laborales -->
-    <ion-card-header>
-      <ion-card-title class="card-title">
-        Seleccionar días laborales
-      </ion-card-title>
+      <ion-card-title class="card-title">Seleccionar Año y Trimestre</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-item class="input">
-        <ion-select aria-label="Días laborales" placeholder="Seleccione los días de atención" [multiple]="true">
-          <ion-select-option value="1">Lunes</ion-select-option>
-          <ion-select-option value="2">Martes</ion-select-option>
-          <ion-select-option value="3">Miércoles</ion-select-option>
-          <ion-select-option value="4">Jueves</ion-select-option>
-          <ion-select-option value="5">Viernes</ion-select-option>
-          <ion-select-option value="6">Sábado</ion-select-option>
-          <ion-select-option value="7">Domingo</ion-select-option>
+        <ion-select *ngFor="let anno of annoTrimestreList" aria-label="Año-Trimestre" placeholder="Año-Trimestre" ok-text="Aceptar" cancel-text="Cancelar" (ionChange)="loadCalendar()">
+          <ion-select-option value="1">2024-4</ion-select-option>
         </ion-select>
       </ion-item>
-      
     </ion-card-content>
-  <!-- Tiempo por bloque -->
-    <ion-card-header>
-      <ion-card-title class="card-title">Tiempo por consulta en minutos</ion-card-title>
-      <ion-card-subtitle>Mínimo 10 minutos, máximo 60 minutos</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
+    <ng-container *ngIf="showCalendar">
+      <ion-card-content>
+        <ion-datetime
+        [(ngModel)]="daySelected"
+        presentation="date"
+        [value]="minDate"
+        [min]="minDate"
+        max="2024-12"
+        (ionChange)="showBtnOptions(daySelected)"></ion-datetime>
+      </ion-card-content>
+      <ng-container *ngIf="showBtnOptions(daySelected)==false && daySelected != ''">
+        <ion-card-content>
+          <ion-label>No tiene agendas este día</ion-label>
+          <ion-button class="btn" (click)="loadOptions()">Crear Agenda</ion-button>
+        </ion-card-content>
+      </ng-container>
+      <ng-container *ngIf="showBtnOptions(daySelected)==true">
+        <ion-card-content>
+          <ion-label>Tiene agendas este día</ion-label>
+          <ion-button class="btn" (click)="loadOptions()">Modificar Agenda</ion-button>
+        </ion-card-content>
+      </ng-container>
+    </ng-container>
+<!-- Container, se activa cuando se selecciona el botón crear o modificar agenda -->
+      <ng-container *ngIf="showOptions">
+        <!-- Horas laborales -->
+        <ion-card-header>
+          <ion-card-title class="card-title">Horas laborales</ion-card-title>
+        </ion-card-header>
+        <ion-card-content class="content-flex">
+          <ion-label>Hora Inicio</ion-label>
+          <ion-datetime-button datetime="startHr" style="margin-right:0.5rem;"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime presentation="time" id="startHr"></ion-datetime>
+            </ng-template>
+          </ion-modal>
 
-      <ion-item class="input">
-        <ion-input labelPlacement="fixed" type="number" min="10" max="60" value="10"></ion-input>
-      </ion-item>
-    </ion-card-content>
+          <ion-label>Hora Término</ion-label>
+          <ion-datetime-button datetime="endHr"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime presentation="time" id="endHr"></ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-card-content>
+      
+        <!-- Descanso -->
+
+        <ion-card-header>
+          <ion-card-title class="card-title">Horas de Descanso</ion-card-title>
+        </ion-card-header>
+        <ion-card-content class="content-flex">
+          <ion-label>Hora Inicio</ion-label>
+          <ion-datetime-button datetime="startHrBreak" style="margin-right:0.5rem;"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime presentation="time" id="startHrBreak"></ion-datetime>
+            </ng-template>
+          </ion-modal>
+
+        <ion-label>Hora Término</ion-label>
+        <ion-datetime-button datetime="endHrBreak"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime presentation="time" id="endHrBreak"></ion-datetime>
+          </ng-template>
+        </ion-modal>
+        </ion-card-content>
+
+        <!-- Tiempo por bloque -->
+        <ion-card-header>
+          <ion-card-title class="card-title">Tiempo por consulta en minutos</ion-card-title>
+          <ion-card-subtitle>Mínimo 10 minutos, máximo 60 minutos</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item class="input">
+            <ion-input labelPlacement="fixed" type="number" min="10" max="60" value="10"></ion-input>
+          </ion-item>
+        </ion-card-content>
+        <!-- Guardar agenda -->
+         <ion-card-content>
+          <ion-button class="btn">
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            Agregar a Agenda</ion-button>
+         </ion-card-content>
+      </ng-container>
   </ion-card>
-  <ion-card class="card">
-    <ion-card-header>
-      <ion-card-title class="card-title">Apertura de Horas Médicas</ion-card-title>
-      <ion-card-subtitle>Defina aquí como desea mantener disponible el calendario de consultas médicas</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-checkbox labelPlacement="end">Mantener agenda siempre disponible</ion-checkbox>
-    </ion-card-content>
-    <ion-card-content>
-      Meses de apertura de agenda
-      <ion-item class="input">
-        <ion-input labelPlacement="fixed" type="number" min="1" max="12" value="1"></ion-input>
-      </ion-item>
-    </ion-card-content>
-    <ion-card-content>
-      <ion-label>Cerrar agenda en un rango de días</ion-label>
-    </ion-card-content>
-    <ion-card-content class="content-flex">
-      <ion-label>Fecha inicio</ion-label>
-      <ion-datetime-button style="margin-right:0.5rem;" datetime="daysClosedStart"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime presentation="date" id="daysClosedStart"></ion-datetime>
-        </ng-template>
-      </ion-modal>
-      <ion-label>Fecha Término</ion-label>
-      <ion-datetime-button datetime="daysClosedEnd"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime presentation="date" id="daysClosedEnd"></ion-datetime>
-        </ng-template>
-      </ion-modal>
-    </ion-card-content>
-    <ion-card-content>
-      <ion-button class="btn">Cerrar Agenda Indefinidamente</ion-button>
-    </ion-card-content>
-  </ion-card>
-  <ion-button class="btn">Guardar Cambios
+  <ion-button class="btn">
     <ion-icon slot="start" name="save-outline"></ion-icon>
-  </ion-button>
+    Subir Agenda</ion-button>
 </ion-content>
