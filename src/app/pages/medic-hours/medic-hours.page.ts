@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
+import { TodayDateService } from 'src/app/services/today-date.service';
 
 @Component({
   selector: 'app-medic-hours',
@@ -39,7 +40,7 @@ export class MedicHoursPage implements OnInit {
   currentDay = this.todayDate.getDate() +1; // Siempre será el día siguiente al día en que se está consultando
   minDate : string = "";
 
-  constructor(private alertController : AlertController, private toastController : ToastController) { }
+  constructor(private alertController : AlertController, private toastController : ToastController, private today : TodayDateService) { }
 
   ngOnInit() {
     // this.annoTrimestreList.filter()

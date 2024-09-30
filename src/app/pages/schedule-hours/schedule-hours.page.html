@@ -9,11 +9,25 @@
 
 <ion-content [fullscreen]="true">
   <h6 class="content-txt">Aquí puede encontrar sus consultas médicas agendadas.</h6>
-  <ion-list lines="full" *ngIf="hideList== false">
-    <ion-item *ngFor="let hr of setHours">
-      <ion-label><b>{{hr.day}}</b></ion-label>
-      <ion-label>{{hr.hour}}hrs.</ion-label>
-      <ion-label>Dr. {{hr.medic}}</ion-label>
-    </ion-item>
+  <ion-card class="card">
+    <ion-card-content>
+      <ion-datetime
+        presentation="month-year"
+        [value]="defDate"
+        (ionChange)="showScheduledHrs(selectedDate)"
+        [(ngModel)]="selectedDate"></ion-datetime>
+    </ion-card-content>
+  </ion-card>
+  <ion-list lines="full" *ngIf="hideList == false">
+    <ng-container *ngIf="hrsFound">
+      <ion-item *ngFor="let hr of setHours">
+        <ion-label><b>{{hr.day}}</b></ion-label>
+        <ion-label>{{hr.hour}}hrs.</ion-label>
+        <ion-label>Dr. {{hr.medic}}</ion-label>
+      </ion-item>
+    </ng-container>
+    <ng-container *ngIf="!hrsFound">
+      <ion-label><b>No tiene horas médicas este mes</b></ion-label>
+    </ng-container>
   </ion-list>
 </ion-content>

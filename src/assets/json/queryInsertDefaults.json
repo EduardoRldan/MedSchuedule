@@ -1,0 +1,207 @@
+[
+    {
+        "table" : "especialidad",
+        "columns" : "nom_esp",
+        "values" : "'Medicina General'"
+      },
+      {
+        "table" : "especialidad",
+        "columns" : "nom_esp",
+        "values" : "'Kinesiología'"
+      },
+      {
+        "table" : "especialidad",
+        "columns" : "nom_esp",
+        "values" : "'Pediatría'"
+      },
+      {
+        "table" : "especialidad",
+        "columns" : "nom_esp",
+        "values" : "'Oncología'"
+      },
+      {
+        "table" : "especialidad",
+        "columns" : "nom_esp",
+        "values" : "'Traumatología'"
+      },
+      {
+        "table" : "especialidad",
+        "columns" : "nom_esp",
+        "values" : "'Otorrinolaringología'"
+      },
+      {
+        "table" : "role",
+        "columns" : "role_name",
+        "values" : "'Paciente'"
+      },
+      {
+        "table" : "role",
+        "columns" : "role_name",
+        "values" : "'Médico'"
+      },
+      {
+        "table" : "role",
+        "columns" : "role_name",
+        "values" : "'Admin'"
+      },
+      {
+        "table" : "estado_cita",
+        "columns" : "nom_estado",
+        "values" : "'Activo'"
+      },
+      {
+        "table" : "estado_cita",
+        "columns" : "nom_estado",
+        "values" : "'Cancelado'"
+      },
+      {
+        "table" : "estado_cita",
+        "columns" : "nom_estado",
+        "values" : "'Finalizado'"
+      },
+      {
+        "table": "trimestre",
+        "columns" : "nom_trimestre",
+        "values" : "'Primer'"
+      },
+      {
+        "table": "trimestre",
+        "columns" : "nom_trimestre",
+        "values" : "'Segundo'"
+      },
+      {
+        "table": "trimestre",
+        "columns" : "nom_trimestre",
+        "values" : "'Tercer'"
+      },
+      {
+        "table": "trimestre",
+        "columns" : "nom_trimestre",
+        "values" : "'Cuarto'"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Enero',1"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Febrero',1"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Marzo',1"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Abril',2"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Mayo',2"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Junio',2"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Julio',3"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Agosto',3"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Septiembre',3"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Octubre',4"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Noviembre',4"
+      },
+      {
+        "table": "mes",
+        "columns" : "nom_mes,id_trimestre",
+        "values": "'Diciembre',4"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Registro de usuario'"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Log in usuario'"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Nueva Cita médica'"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Cancela cita médica'"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Nueva Agenda'"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Modifica Agenda'"
+      },
+      {
+        "table": "log_type",
+        "columns" : "desc_type",
+        "values": "'Log out usuario'"
+      },
+      {
+        "table": "anno",
+        "columns" : "anno, id_trimestre, active",
+        "values": "'2024',1,0"
+      },
+      {
+        "table": "anno",
+        "columns" : "anno, id_trimestre, active",
+        "values": "'2024',2,0"
+      },
+      {
+        "table": "anno",
+        "columns" : "anno, id_trimestre, active",
+        "values": "'2024',3,1"
+      },
+      {
+        "table": "anno",
+        "columns" : "anno, id_trimestre, active",
+        "values": "'2024',4,1"
+      },
+      {
+        "table": "user",
+        "columns" : "email, pw, active, foto_perfil, id_role",
+        "values": "'d.fernoliva@gmail.com', 'contraseña2024',1,NULL,2"
+      },
+      {
+        "table": "medico",
+        "columns" : "numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user",
+        "values": "18007012,'5','Diego','Andrés','Fernández','Oliva',981744765,'Box 1',30,1,1"
+      }
+]
