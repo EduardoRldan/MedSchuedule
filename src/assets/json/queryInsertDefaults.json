@@ -197,7 +197,7 @@
       {
         "table": "user",
         "columns" : "email, pw, active, foto_perfil, id_role",
-        "values": "'d.fernoliva@gmail.com', 'contraseña2024',1,NULL,2"
+        "values": "'d.fernoliva@gmail.com', 'contrasena2024',1,NULL,2"
       },
       {
         "table": "medico",

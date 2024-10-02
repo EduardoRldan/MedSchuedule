@@ -11,13 +11,13 @@
       <form [formGroup]="loginForm">
         <ion-item class="input">
           <ion-icon slot="start" name="mail-outline"></ion-icon>
-          <ion-input [(ngModel)]="mail" type="email" formControlName="email" label="E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
+          <ion-input [(ngModel)]="mail" [disabled]="!dbReady" type="email" formControlName="email" label="E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
         </ion-item>
         <ion-label color="danger" *ngIf="loginForm.get('email').touched && loginForm.get('email').errors?.email">Email no es válido</ion-label>
         <ion-label color="danger" *ngIf="loginForm.get('email').touched && loginForm.get('email').errors?.required">Introduzca su email</ion-label>
         <ion-item class="input">
           <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
-          <ion-input [(ngModel)]="pw" label="Contraseña" type="password" formControlName="password" labelPlacement="floating" placeholder="Inserte su contraseña"></ion-input>
+          <ion-input [(ngModel)]="pw" [disabled]="!dbReady" label="Contraseña" type="password" formControlName="password" labelPlacement="floating" placeholder="Inserte su contraseña"></ion-input>
           <ion-icon slot="end" name="eye-outline"></ion-icon>
         </ion-item>
         <ion-label color="danger" *ngIf="loginForm.get('password').touched && loginForm.get('password').errors?.required">Introduzca su contraseña</ion-label>

@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
-import { ToastController } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
+import { BehaviorSubject } from 'rxjs';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { AlerttoastService } from './alerttoast.service';
 
 
 @Injectable({
@@ -15,6 +18,7 @@ export class ServicebdService {
     'CREATE TABLE IF NOT EXISTS estado_cita (id_estado INTEGER PRIMARY KEY AUTOINCREMENT, nom_estado VARCHAR(10) NOT NULL);',
     'CREATE TABLE IF NOT EXISTS log_type (id_type INTEGER PRIMARY KEY AUTOINCREMENT, desc_type VARCHAR(50) NOT NULL);',
     'CREATE TABLE IF NOT EXISTS user (id_user INTEGER PRIMARY KEY AUTOINCREMENT, email VARCHAR(50) UNIQUE NOT NULL, pw VARCHAR(100) NOT NULL, active INTEGER CHECK(active IN (0,1)), foto_perfil BLOB, id_role INTEGER NOT NULL, FOREIGN KEY(id_role) REFERENCES role(id_role));',
+    'CREATE TABLE IF NOT EXISTS log (id_log INTEGER PRIMARY KEY AUTOINCREMENT, anno_log INTEGER NOT NULL, mes_log INTEGER NOT NULL, dia_log INTEGER NOT NULL, hora_log VARCHAR(10) NOT NULL, id_user INTEGER NOT NULL, id_type INTEGER NOT NULL, FOREIGN KEY(id_user) REFERENCES user(id_user), FOREIGN KEY(id_type) REFERENCES log_type(id_type);',
     'CREATE TABLE IF NOT EXISTS medico (numrun_medico INTEGER PRIMARY KEY, dvrun_medico VARCHAR(1) NOT NULL, pnombre_medico VARCHAR(50) NOT NULL, snombre_medico VARCHAR(50) NOT NULL, apaterno_medico VARCHAR(50) NOT NULL, amaterno_medico VARCHAR(50) NOT NULL, tel_medico INTEGER NOT NULL, box_medico VARCHAR(50) NOT NULL, tiempo_bloque INTEGER NOT NULL, id_esp INTEGER NOT NULL, id_user INTEGER NOT NULL, FOREIGN KEY(id_esp) REFERENCES especialidad(id_esp), FOREIGN KEY(id_user) REFERENCES user(id_user));',
     'CREATE TABLE IF NOT EXISTS paciente (numrun_paciente INTEGER PRIMARY KEY, dvrun_paciente VARCHAR(1) NOT NULL, pnombre_paciente VARCHAR(50) NOT NULL, snombre_paciente VARCHAR(50) NOT NULL, apaterno_paciente VARCHAR(50) NOT NULL, amaterno_paciente VARCHAR(50) NOT NULL, tel_paciente INTEGER NOT NULL, id_user INTEGER NOT NULL, FOREIGN KEY(id_user) REFERENCES user(id_user));',
     'CREATE TABLE IF NOT EXISTS cita_medica (id_cita INTEGER PRIMARY KEY AUTOINCREMENT, anno_cita INTEGER NOT NULL, mes_cita INTEGER NOT NULL, dia_cita INTEGER NOT NULL, hora_cita VARCHAR(5) NOT NULL, id_estado INTEGER NOT NULL, numrun_paciente INTEGER NOT NULL, numrun_medico INTEGER NOT NULL, FOREIGN KEY(id_estado) REFERENCES estado_cita(id_estado), FOREIGN KEY(numrun_paciente) REFERENCES paciente(numrun_paciente), FOREIGN KEY(numrun_medico) REFERENCES medico(numrun_medico));',
@@ -23,9 +27,14 @@ export class ServicebdService {
     'CREATE TABLE IF NOT EXISTS agenda_medica (id_agenda INTEGER PRIMARY KEY AUTOINCREMENT, mes_agenda INTEGER NOT NULL, dia_agenda INTEGER NOT NULL, hora_inicio VARCHAR(5) NOT NULL, hora_termino VARCHAR(5), numrun_medico INTEGER NOT NULL, id_anno INTEGER NOT NULL, FOREIGN KEY(numrun_medico) REFERENCES medico(numrun_medico), FOREIGN KEY(id_anno) REFERENCES anno(id_anno));'
   ];
   queryInsertDefaults : any;
+  insertsReady : boolean = false;
   // creacion de tablas
+  private isDBReady : BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor(private sqlite : SQLite, private toastController : ToastController) { 
+  constructor(private sqlite : SQLite, 
+    private platform : Platform, 
+    private storage : NativeStorage,
+    private toast : AlerttoastService) { 
     // fetch('./assets/json/queryInsertDefaults.json')
     // .then(res => res.json)
     // .then(json => {
@@ -33,24 +42,19 @@ export class ServicebdService {
     //   console.log('queryDefaults Listo')
     // })
   }
-  async presentToast(msj : string) {
-    const toast = await this.toastController.create({
-      message: msj,
-      duration: 500,
-      position: 'bottom',
-    });
-
-    await toast.present();
-  }
   createDB(){
-    this.sqlite.create({
-      name: 'medschdb',
-      location: 'default'
-    }).then((db: SQLiteObject) =>{
-      this.database = db;
-      this.presentToast('BD creada')
-      this.createTables()
-    }).catch((e: string) => this.presentToast('Error al crear base de datos: '+ e));
+    
+    this.platform.ready().then(()=>{
+      this.sqlite.create({
+        name: 'medschdb',
+        location: 'default'
+      }).then((db: SQLiteObject) =>{
+        this.database = db;
+        this.toast.presentToast('BD creada')
+        this.isDBReady.next(true);
+        this.createTables()
+      }).catch((e: string) => this.toast.presentToast('Error al crear base de datos: '+ JSON.stringify(e), 500));
+    })
   }
 
   async createTables(){
@@ -58,68 +62,87 @@ export class ServicebdService {
       let query = this.queryTables[i];
       try{
         await this.database.executeSql(query, []);
-        this.presentToast( (i+1)+' Tablas creadas');
+        this.toast.presentToast( (i+1)+' Tablas creadas');
         console.log('Tabla creada')
         // no se si falta algo aquí
-      } catch(error) {
-        this.presentToast('Error al crear tabla :' + error);
-        console.log('Error al crear tabla: '+ error);
+      } catch(e) {
+        this.toast.presentToast('Error al crear tabla :' + JSON.stringify(e));
+        console.log('Error al crear tabla: '+ JSON.stringify(e));
       }
     }
-    this.presentToast('Tablas completadas');
+    this.toast.presentToast('Tablas completadas');
     console.log("Tablas completas");
     this.insertDefaultValues();
   }
   async insertDefaultValues(){
     console.log("en insertDefaultValues");
-    fetch('./assets/json/queryInsertDefaults.json')
+    let ready : boolean = false;
+    await fetch('./assets/json/queryInsertDefaults.json')
     .then(res => res.json())
     .then(json => {
       this.queryInsertDefaults = json;
-      for (let elemento of this.queryInsertDefaults) {
-        const table = elemento.table;
-        const query = "DELETE FROM "+ table + ";"
-        this.database.executeSql(query, [])
-        .then(()=> {
-          console.log('Limpiando Registros')
-        })
-        .catch(e => this.presentToast('Error de registro: '+ e));
-      }
-      // let exQuery = "INSERT INTO especialidad(nom_esp) VALUES('Medicina General');"
-      // this.database.executeSql(exQuery,[])
-      // .then(()=> console.log('Dato insertado de prueba'))
-      // .catch(e => console.log('Error '+ e));
+    })
+    for (let elemento of this.queryInsertDefaults) {
+      const table = elemento.table;
+      const query = "DELETE FROM "+ table + ";"
+      await this.database.executeSql(query, [])
+      .then(()=> {
+        console.log('Limpiando Registros')
+      })
+      .catch(e => this.toast.presentToast('Error de registro: '+ JSON.stringify(e)));
+    }
 
-      for (let elemento of this.queryInsertDefaults) {
-        const table = elemento.table;
-        const values = elemento.values;
-        const columns = elemento.columns;
-        const query = "INSERT INTO "+ table + "("+ columns +")"+ " VALUES(" + values + ");"
-        this.database.executeSql(query, [])
-        .then(()=> console.log('Dato insertado correctamente'))
-        .catch(e => this.presentToast('Error de registro: '+ e)); 
-      }
-    })
-    this.presentToast('Registros completos');
+    for (let elemento of this.queryInsertDefaults) {
+      const table = elemento.table;
+      const values = elemento.values;
+      const columns = elemento.columns;
+      const query = "INSERT OR IGNORE INTO "+ table + "("+ columns +")"+ " VALUES(" + values + ");"
+      await this.database.executeSql(query, [])
+      .then(()=> {
+        console.log('Dato insertado en '+ table + ' Columnas ' + columns + ' Valores '+ values);
+        ready = true;
+      })
+      .catch(e => this.toast.presentToast('Error de registro: '+ JSON.stringify(e))); 
+    }
+    this.toast.presentToast('Registros completos');
+    this.insertsReady = ready;
   }
-  getUser(email : string, pw : string){
-    let query = "SELECT email, pw FROM user WHERE email='"+ email + "' AND pw='"+ pw + "';";
-    let idUser = "";
-    let em = "";
-    let active = ""
-    let role = "";
-    this.database.executeSql(query,[])
+
+  async getUser(email : string, pw : string){
+    let response = {};
+    let isValid = false;
+    let query = "SELECT * FROM user WHERE email='"+ email + "' AND  pw='"+ pw + "';";
+    await this.database.executeSql(query,[])
     .then((res) => {
-      idUser = res.rows.item(0).id_user;
-      em = res.rows.item(0).email;
-      active = res.rows.item(0).active;
-      role = res.rows.item(0).id_role;
-      console.log(active);
-    }). catch((e) => {
-      this.presentToast('Usuario no encontrado' + e);
-      console.log('NOT FOUND');
-    })
+      console.log('Query passed. Length: '+res.rows.length);
+      if (res.rows.length>0){
+        console.log('Usuario encontrado')
+        console.log(res.rows.item(0).id_user);
+        response = {
+          idUser : res.rows.item(0).id_user,
+          email : res.rows.item(0).email,
+          active : res.rows.item(0).active,
+          fotoPerfil : res.rows.item(0).foto_perfil,
+          idRole : res.rows.item(0).id_role
+        }
+        isValid = true;
+        this.storage.setItem("userLogged", JSON.stringify(response));
+      }
+    }).catch((e) => {
+      this.toast.presentToast('Usuario no encontrado: '+ JSON.stringify(e))
+    });
+    return isValid;
   }
+
+  allInsertsReady(){
+    return this.insertsReady;
+  }
+
+  insertLog(userId : number, logType : number){
+    const query = 'INSERT INTO log'
+  }
+
+  /// SOLO POR PROPOSITOS DE TESTING, NO USAR
   getAllTables(){
     let tableList = [];
     this.database.executeSql("SELECT name FROM sqlite_master WHERE type='table';",[])
@@ -131,8 +154,22 @@ export class ServicebdService {
       }
       return tableList;
     }).catch((error) => {
-      this.presentToast('Error en datos: '+ error);
+      this.toast.presentToast('Error en datos: '+ error);
     })
+  }
+
+  async getAllUsers(){
+    let result = [];
+    let query = "SELECT * FROM user WHERE email='d.fernoliva@gmail.com' AND  pw='contrasena2024';";
+    await this.database.executeSql(query,[])
+    .then((res) => {
+      console.log('Query passed. Length: '+res.rows.length);
+      if (res.rows.length>0){
+        console.log('hay datos en la tabla')
+        console.log(res.rows.item(0).email);
+        console.log(res.rows.item(0).pw);
+      }
+    }).catch(e => console.log('Sin resultados '+ e));
   }
 }
 
