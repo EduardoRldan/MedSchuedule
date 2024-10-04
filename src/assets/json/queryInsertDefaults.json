@@ -198,10 +198,5 @@
         "table": "user",
         "columns" : "email, pw, active, foto_perfil, id_role",
         "values": "'d.fernoliva@gmail.com', 'contrasena2024',1,NULL,2"
-      },
-      {
-        "table": "medico",
-        "columns" : "numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user",
-        "values": "18007012,'5','Diego','Andrés','Fernández','Oliva',981744765,'Box 1',30,1,1"
       }
 ]

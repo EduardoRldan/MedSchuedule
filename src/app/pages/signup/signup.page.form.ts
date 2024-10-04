@@ -13,7 +13,15 @@ export class SignupForm {
                 Validators.required, 
                 Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
             ]],
+            secondName : ['', [
+                Validators.required, 
+                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
+            ]],
             lastName : ['', [
+                Validators.required, 
+                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
+            ]],
+            secondLastName : ['', [
                 Validators.required, 
                 Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
             ]],

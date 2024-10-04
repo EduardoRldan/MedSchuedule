@@ -7,8 +7,8 @@
 <ion-content [fullscreen]="true">
   <ion-card class="card"  style="min-height:15rem;">
     <ion-card-header>
-      <ion-card-title class="card-title">Bienvenido, {{user.name}}</ion-card-title>
-      <ion-card-subtitle>{{date | date :'d/MM/YYYY - hh:mm'}}</ion-card-subtitle>
+      <ion-card-title class="card-title">Bienvenido, {{patientLogged.pnombrePaciente}} {{patientLogged.apaternoPaciente}}</ion-card-title>
+      <ion-card-subtitle>{{date | date :'MMMM d, YYYY'}}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content *ngFor="let hr of setHours">
       <div *ngIf="setHours.length != 0; then gotHours else noHours"></div>
@@ -26,7 +26,7 @@
     </ion-card-content>
     <ion-card-content><ion-label *ngIf="setHours.length == 0">No tiene horas agendadas</ion-label></ion-card-content>
   </ion-card>
-  <app-btn-router page="/tab-paciente/pagina-busqueda" label="Agendar Hora Médica" icon="calendar-number-outline"></app-btn-router>
+  <app-btn-router page="/pagina-busqueda" label="Agendar Hora Médica" icon="calendar-number-outline"></app-btn-router>
   <app-btn-router page="/schedule-hours" [dataToSend]="setHours" label="Ver Horas Agendadas" icon="alarm-outline"></app-btn-router>
   <!-- <ion-button class="btn" (click)="goToPage('/pagina-busqueda')">
     <ion-icon slot="start" name="calendar-number-outline"></ion-icon>

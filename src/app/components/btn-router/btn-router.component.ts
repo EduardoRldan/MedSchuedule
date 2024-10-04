@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NavigationExtras, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-btn-router',
@@ -13,7 +13,7 @@ export class BtnRouterComponent  implements OnInit {
   @Input() dataToSend : any;
   iconPresent : boolean = false;
 
-  constructor(private router : Router) { }
+  constructor(private router : Router, private activatedRoute : ActivatedRoute) { }
 
   ngOnInit() {
     if(this.icon != ""){
@@ -26,7 +26,7 @@ export class BtnRouterComponent  implements OnInit {
       let navExtras : NavigationExtras = this.dataToSend;
       this.router.navigate([link],navExtras)
     } else {
-      this.router.navigate([link]);
+      this.router.navigate([link], {relativeTo : this.activatedRoute});
     }
   }
 }

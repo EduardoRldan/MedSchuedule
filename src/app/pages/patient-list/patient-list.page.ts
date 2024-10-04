@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { NavigationExtras, Router } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivationStart, NavigationExtras, Router, RouterOutlet } from '@angular/router';
 import { TodayDateService } from 'src/app/services/today-date.service';
 
 @Component({
@@ -15,6 +15,7 @@ export class PatientListPage implements OnInit {
   constructor(private router:Router, private today : TodayDateService) { }
 
   ngOnInit() {
+
     this.defDate = this.today.todayDate();
   }
   showPatientList(){
