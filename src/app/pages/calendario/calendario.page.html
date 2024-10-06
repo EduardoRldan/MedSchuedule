@@ -3,14 +3,15 @@
     <ion-buttons slot="start">
       <app-btn-back page="/tab-paciente/pagina-busqueda"></app-btn-back>
     </ion-buttons>
-    <ion-title>{{ medicObj.nombre }}</ion-title>
+    <ion-title>{{ medicObj.nombreMedico }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-card class="card" style="min-height:5rem;">
-    <ion-card-title class="card-title">{{ medicObj.nombre }}</ion-card-title>
+    <ion-card-title class="card-title">{{ medicObj.nombreMedico }}</ion-card-title>
     <ion-card-subtitle>{{ medicObj.especialidad }}</ion-card-subtitle>
+    <ion-card-subtitle>{{ medicObj.numrunMedico }}-{{ medicObj.dvrunMedico }}</ion-card-subtitle>
   </ion-card>
   <ion-card class="card">
     <ion-card-content>
@@ -18,14 +19,19 @@
       [(ngModel)]="selectedDate" 
       presentation="date" 
       min="{{ minDate }}" 
-      max="{{ maxDate }}"
-      (ionChange)="populateHourList(selectedDate, medicObj)"></ion-datetime>
+      (ionChange)="showList(selectedDate)"></ion-datetime>
     </ion-card-content>
   </ion-card>
   <ion-list *ngIf="hideList==false" lines="full">
     <ion-list-header>
       <h3>{{dateStr}}</h3>
     </ion-list-header>
+    <ion-item *ngIf="!dayExists(selectedDate)">
+      <ion-label>No hay horas para este día</ion-label>
+    </ion-item>
+    <ion-item *ngIf="dayExists(selectedDate)">
+      <ion-label>Hay horas</ion-label>
+    </ion-item>
     <ion-item *ngFor="let block of hourList; index as i">
       <!-- <ion-label>{{block.hora}}</ion-label>
       <ion-label>Disponible</ion-label>

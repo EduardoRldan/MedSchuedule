@@ -17,6 +17,7 @@ export class MainPageMedicPage implements OnInit {
   todayAgenda : any = [];  // almacena la lista de consultas solo del día
   userLogged! : User;
   medicLogged! : Medic;
+  loadReady : boolean = false;
   constructor(private storage : NativeStorage, 
     private handler : ObjectHandlerService, 
     private bd : ServicebdService, 
@@ -25,16 +26,16 @@ export class MainPageMedicPage implements OnInit {
 
   ngOnInit() {
     this.storage.getItem('userLogged').then((data) =>{
-      console.log("Usuario logueado")
+      console.log("DFO: Usuario logueado")
       this.userLogged = this.handler.createUserObject(data);
       let idUs = this.userLogged.idUser;
       this.bd.getMedic(idUs)
       .then(()=> {
         this.storage.getItem('medicLogged')
         .then((data)=>{
-          console.log('Medico encontrado')
+          console.log('DFO: Medico encontrado')
           this.medicLogged = this.handler.createMedicObject(JSON.parse(data))
-          console.log(this.medicLogged.pnombreMedico);
+          this.loadReady=true;
         })
       })
     });

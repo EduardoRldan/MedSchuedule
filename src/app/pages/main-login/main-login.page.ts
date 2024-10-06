@@ -63,7 +63,7 @@ export class MainLoginPage implements OnInit, OnDestroy {
   }
 
   async getCount(){
-    this.bd.getAllMedics();
+    this.bd.getAllUsers();
   }
 
   redirectToPage(role : number){
@@ -71,10 +71,10 @@ export class MainLoginPage implements OnInit, OnDestroy {
 
     switch(role){
       case 1:
-        this.router.navigate(['/main-page']);
+        this.router.navigate(['/tab-paciente/main-page']);
         break;
       case 2:
-        this.router.navigate(['/main-page-medic']);
+        this.router.navigate(['/tab-medico/main-page-medic']);
         break;
       case 3:
         this.toast.presentToast('Usted es admin');

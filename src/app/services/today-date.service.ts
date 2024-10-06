@@ -10,6 +10,7 @@ export class TodayDateService {
 
   constructor() { }
   todayDate(){
+    // Muestra la fecha de hoy en formato string segun ISO 8601
     const defDate= new Date(Date.now());
     const year = defDate.getFullYear();
     const month = defDate.getMonth()+1;
@@ -28,11 +29,12 @@ export class TodayDateService {
     } else {
       dayToStr = day.toString()
     }
-    const dateToStr = yearToStr + "-" + monthToStr + "-" + dayToStr;
+    const dateToStr = yearToStr + "-" + monthToStr + "-" + dayToStr + "T00:00:00";
     return dateToStr;
   }
 
   tomorrowDate(){
+    // Muestra la fecha de mañana en string en formato ISO 8601
     const defDate= new Date(Date.now());
     const year = defDate.getFullYear();
     const month = defDate.getMonth()+1;
@@ -51,7 +53,7 @@ export class TodayDateService {
     } else {
       dayToStr = day.toString()
     }
-    const dateToStr = yearToStr + "-" + monthToStr + "-" + dayToStr;
+    const dateToStr = yearToStr + "-" + monthToStr + "-" + dayToStr + "T00:00:00";
     return dateToStr;
   }
 
@@ -60,5 +62,33 @@ export class TodayDateService {
     // no toma las horas
     const strDate = strDateISOFormat.substring(0,10).split('-');
     return strDate
+  }
+  splitHour(strDateISOFormat : string){
+    const strHour = strDateISOFormat.split('T');
+    return strHour[1];
+  }
+
+  todayIso(){
+    return new Date(Date.now()).toISOString()
+  }
+
+  formatDate(date : string){
+    const meses = ["Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ];
+    const split = this.splitDate(date);
+    let monthIdx = parseInt(split[1])
+    let month = meses[monthIdx-1]
+    return String(split[2] + " de "+ month + " de "+ split[0]);
   }
 }

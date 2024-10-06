@@ -16,20 +16,14 @@
     </ion-card-header>
     <ion-card-content>
       <ion-item class="input">
-        <ion-select *ngFor="let anno of annoTrimestreList" aria-label="Año-Trimestre" placeholder="Año-Trimestre" ok-text="Aceptar" cancel-text="Cancelar" (ionChange)="loadCalendar()">
-          <ion-select-option value="1">2024-4</ion-select-option>
+        <ion-select  aria-label="Año-Trimestre" placeholder="Año-Trimestre" ok-text="Aceptar" cancel-text="Cancelar" (ionChange)="loadCalendar()">
+          <ion-select-option value="1">{{ annoTrimestre.anno }}-{{ annoTrimestre.idTrimestre }}</ion-select-option>
         </ion-select>
       </ion-item>
     </ion-card-content>
     <ng-container *ngIf="showCalendar">
       <ion-card-content>
-        <ion-datetime
-        [(ngModel)]="daySelected"
-        presentation="date"
-        [value]="minDate"
-        [min]="minDate"
-        max="2024-12"
-        (ionChange)="showBtnOptions(daySelected)"></ion-datetime>
+        <ion-datetime [(ngModel)]="daySelected" (ionChange)="triggerDate($event)" presentation="date" [min]="defDate" [monthValues]="annoTrimestre.meses" [yearValues]="annoTrimestre.anno"></ion-datetime>
       </ion-card-content>
       <ng-container *ngIf="showBtnOptions(daySelected)==false && daySelected != ''">
         <ion-card-content>
@@ -52,18 +46,18 @@
         </ion-card-header>
         <ion-card-content class="content-flex">
           <ion-label>Hora Inicio</ion-label>
-          <ion-datetime-button datetime="startHr" style="margin-right:0.5rem;"></ion-datetime-button>
+          <ion-datetime-button  datetime="startHr" style="margin-right:0.5rem;"></ion-datetime-button>
           <ion-modal [keepContentsMounted]="true">
             <ng-template>
-              <ion-datetime presentation="time" id="startHr"></ion-datetime>
+              <ion-datetime (ionChange)="isHigherThanStart()" [(ngModel)]="startHour" [value]="defDate" presentation="time" id="startHr"></ion-datetime>
             </ng-template>
           </ion-modal>
 
           <ion-label>Hora Término</ion-label>
-          <ion-datetime-button datetime="endHr"></ion-datetime-button>
+          <ion-datetime-button  datetime="endHr"></ion-datetime-button>
           <ion-modal [keepContentsMounted]="true">
             <ng-template>
-              <ion-datetime presentation="time" id="endHr"></ion-datetime>
+              <ion-datetime (ionChange)="isHigherThanStart()" [(ngModel)]="endHour" [value]="defDate" presentation="time" id="endHr"></ion-datetime>
             </ng-template>
           </ion-modal>
         </ion-card-content>
@@ -75,10 +69,10 @@
         </ion-card-header>
         <ion-card-content class="content-flex">
           <ion-label>Hora Inicio</ion-label>
-          <ion-datetime-button datetime="startHrBreak" style="margin-right:0.5rem;"></ion-datetime-button>
+          <ion-datetime-button  datetime="startHrBreak" style="margin-right:0.5rem;"></ion-datetime-button>
           <ion-modal [keepContentsMounted]="true">
             <ng-template>
-              <ion-datetime presentation="time" id="startHrBreak"></ion-datetime>
+              <ion-datetime (ionChange)="isHigherThanStart()" [(ngModel)]="breakStart" [value]="defDate" presentation="time" id="startHrBreak"></ion-datetime>
             </ng-template>
           </ion-modal>
 
@@ -86,7 +80,7 @@
         <ion-datetime-button datetime="endHrBreak"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime presentation="time" id="endHrBreak"></ion-datetime>
+            <ion-datetime (ionChange)="isHigherThanStart()" [(ngModel)]="breakEnd" [value]="defDate" presentation="time" id="endHrBreak"></ion-datetime>
           </ng-template>
         </ion-modal>
         </ion-card-content>
@@ -98,18 +92,21 @@
         </ion-card-header>
         <ion-card-content>
           <ion-item class="input">
-            <ion-input labelPlacement="fixed" type="number" min="10" max="60" value="10"></ion-input>
+            <ion-input (ionChange)="bloqueIsValid()" [(ngModel)]="tBloque" labelPlacement="fixed" type="number" min="10" max="60" [value]="medicLogged.tiempoBloque"></ion-input>
           </ion-item>
         </ion-card-content>
         <!-- Guardar agenda -->
          <ion-card-content>
-          <ion-button class="btn">
+          <ion-label color="warning" *ngIf="isHigherThanStart()">Las horas de inicio no pueden ser mayores a las horas de termino</ion-label>
+          <ion-label color="warning" *ngIf="!bloqueIsValid">El bloque no está en el rango válido</ion-label>
+          <ion-button [disabled]="isHigherThanStart() || !bloqueIsValid()" (click)="saveToList()" class="btn">
             <ion-icon slot="start" name="save-outline"></ion-icon>
             Agregar a Agenda</ion-button>
          </ion-card-content>
       </ng-container>
   </ion-card>
-  <ion-button class="btn">
+  <ion-button color="danger" (click)="recorreLista()"></ion-button>
+  <ion-button (click)="confirmAlert()" [disabled]="agendaList.length == 0" class="btn">
     <ion-icon slot="start" name="save-outline"></ion-icon>
     Subir Agenda</ion-button>
 </ion-content>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { EncoderService } from 'src/app/services/encoder.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 
 @Component({
@@ -15,18 +16,19 @@ export class PaginaBusquedaPage implements OnInit {
   // Se construye por el momento una lista de médicos que debe incluir los siguientes argumentos
   // Nombre, Especialidad, rango de duración de cada bloque (en minutos), hora de inicio, hora de termino
   especialidades : any = [];
+
+  // los objetos almacenados en esta lista contienen las siguientes claves: numrunMedico, dvrunMedico, nombreMedico, especialidad
   medList : any = [];
 
   selectedId : string = "";
 
   filteredList : any;
-  constructor(private router:Router, private activatedroute : ActivatedRoute, private bd : ServicebdService, private storage : NativeStorage) {
+  constructor(
+    private router:Router, 
+    private activatedroute : ActivatedRoute, 
+    private bd : ServicebdService, 
+    private storage : NativeStorage) {
     
-    // this.activatedroute.queryParams.subscribe( param => {
-    //   if (this.router.getCurrentNavigation()?.extras.state) {
-    //     this.user = this.router.getCurrentNavigation()?.extras?.state?.['user']
-    //   }
-    // })
   }
 
   ngOnInit() {
@@ -43,7 +45,20 @@ export class PaginaBusquedaPage implements OnInit {
         for (let i = 0;i<this.medList.length;i++){
           let medic = this.medList[i]
           let medVal = Object.values(medic);
-          this.especialidades.push(medVal[3]);
+          let especialidad = 
+          {
+            id : 0,
+            nomEsp : ""
+          }
+          if (especialidad.id != medVal[3]){
+            console.log('DFO: nomesp: '+ medVal[4])
+            especialidad = 
+            {
+              id : medVal[3] as number,
+              nomEsp : medVal[4] as string
+            }
+            this.especialidades.push(especialidad)
+          }
           console.log('DFO: Llenando lista de especialidades: '+medVal[3])
         }
       })
@@ -51,9 +66,10 @@ export class PaginaBusquedaPage implements OnInit {
   }
 
   filterBySpeciality(speciality:string) {
+    console.log(speciality);
     let list = this.medList;
     const result = list.filter((obj: any) =>{
-      return obj.espId === parseInt(speciality);
+      return obj.idEsp === parseInt(speciality);
     });
     this.filteredList = result;
   }
@@ -61,7 +77,7 @@ export class PaginaBusquedaPage implements OnInit {
   filterByName(name:string) {
     let list = this.medList;
     const result = list.filter((obj:any) => {
-      return obj.nombre.toLowerCase().includes(name.toLowerCase());
+      return obj.nombreMedico.toLowerCase().includes(name.toLowerCase());
     });
     this.filteredList = result;
   }
@@ -69,8 +85,7 @@ export class PaginaBusquedaPage implements OnInit {
   redirect(medicObj:any) {
     let navigationextras : NavigationExtras = {
       state : {
-        medicObj : medicObj,
-        user : this.user
+        medicObj : medicObj
       }
     }
     this.router.navigate(['/calendario'], navigationextras)

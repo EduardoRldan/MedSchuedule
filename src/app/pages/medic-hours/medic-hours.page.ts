@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlertController, ToastController } from '@ionic/angular';
+import { Medic } from 'src/app/classes/medic';
+import { ObjectHandlerService } from 'src/app/services/object-handler.service';
+import { ServicebdService } from 'src/app/services/servicebd.service';
 import { TodayDateService } from 'src/app/services/today-date.service';
 
 @Component({
@@ -15,49 +20,84 @@ export class MedicHoursPage implements OnInit {
   // Al seleccionar un día del calendario los botones de selección se mostrarán dependiendo de si existe el día agendado o
   // no hay ningun día agendado en la tabla (modificar o crear).
 
+  // Medico
+  medicLogged! : Medic;
+  tBloque : number = 30;
 
   // Lista de Consultas año-trimestre
-  annoTrimestreList : any =[
-    {
-      id : 1,
-      anno : 2024,
-      id_trimestre : 4
-    }
-  ];
+  annoTrimestre : any = {
+    idAnno : 0,
+    anno : 0,
+    idTrimestre : 0,
+    meses : []
+  }
   // Lista consultas agenda
-  agendaList : any = [];
-  // lista que se pobla según los meses del trimestre seleccionado
-  monthEnabledList : any = [10, 11, 12]
+  agendaList : Array<object> = [];
+  /// mantener el formato de objeto
+  agendaObj : object = {
+    mes : 0,
+    dia : 0,
+    horaInicio : "",
+    horaTermino : "",
+    numrunMedico : 0,
+    idAnno : 0
+  }
 
   showOptions : boolean = false;
   showCalendar : boolean = false;
-  daySelected : string = "";
+  daySelected! : string;
   previousSelect : string = "";
   // validadores de fecha
-  todayDate = new Date(Date.now())
-  year = this.todayDate.getFullYear();
-  month = this.todayDate.getMonth() + 1;
-  currentDay = this.todayDate.getDate() +1; // Siempre será el día siguiente al día en que se está consultando
-  minDate : string = "";
+  defDate : string = ""
+  monthConstraing : Array<number> = []
+  startHour! : string;
+  endHour! : string;
+  breakStart! : string;
+  breakEnd! : string;
 
-  constructor(private alertController : AlertController, private toastController : ToastController, private today : TodayDateService) { }
+  indicator : number = 0;
+  constructor(
+    private alertController : AlertController, 
+    private toastController : ToastController, 
+    private today : TodayDateService,
+    private bd : ServicebdService,
+    private storage : NativeStorage,
+    private handler : ObjectHandlerService,
+    private router : Router) { 
+      this.storage.getItem('medicLogged')
+      .then((data)=>{
+        console.log('DFO: Medico encontrado')
+        this.medicLogged = this.handler.createMedicObject(JSON.parse(data))
+      })
+      this.bd.getAnoTrimestre()
+      .then(() =>{
+        this.storage.getItem('annoTrimestre')
+        .then((data)=> {
+          console.log('DFO: Datos obtenidos ')
+          let obj = data;
+          this.annoTrimestre = obj;
+          this.bd.getAgenda(this.medicLogged.numrunMedico,this.annoTrimestre.idAnno)
+          .then(() =>{
+            this.storage.getItem('agendaLista')
+            .then((data) => {
+              let list: Array<object> = Object.values(data)
+              console.log('DFO: desde medic-hours '+list)
+              console.log('DFO: '+Object.values(list[0]))
+              this.agendaList = list;
+            })
+          })
+        })
+      });
+
+      this.defDate = this.today.tomorrowDate();
+      this.daySelected = this.defDate
+      this.startHour = this.defDate
+      this.endHour = this.defDate
+      this.breakStart = this.defDate
+      this.breakEnd = this.defDate
+    }
 
   ngOnInit() {
-    // this.annoTrimestreList.filter()
-    let monthToStr = "";
-    if (this.month < 10) {
-      monthToStr = "0" + this.month.toString();
-    } else {
-      monthToStr = this.month.toString();
-    }
-    let dayToStr = "";
-    if (this.currentDay < 10){
-      dayToStr = "0"+ this.currentDay.toString();
-    } else {
-      dayToStr = this.currentDay.toString();
-    }
-    let yearToStr = this.year.toString();
-    this.minDate = yearToStr + '-' + monthToStr + '-' + dayToStr;
   }
 
   loadCalendar(){
@@ -70,32 +110,116 @@ export class MedicHoursPage implements OnInit {
       return true;
     }
   }
+
+  triggerDate(event : any){
+    this.daySelected = event.detail.value;
+    this.showBtnOptions(this.daySelected)
+  }
   showBtnOptions(day : string){
     // debe devolver un verdadero o falso si el día ya tiene su agenda o no respectivamente
+    console.log('DFO: daySelected '+this.daySelected)
     if (this.valueChanged(this.previousSelect, day)){
       this.previousSelect = day;
       this.showOptions = false;
     }
-    let stripDay = day.substring(0,10).split('-');
-    let year = parseInt(stripDay[0]);
+    let stripDay = this.today.splitDate(day);
+    let idAnno = this.annoTrimestre.idAnno;
     let mmonth = parseInt(stripDay[1]);
     let dd = parseInt(stripDay[2]);
     // aquí debe consultarse a la lista si algun elemento corresponde al día seleccionado
     //testeo
-    if (dd>20){
-      return true;
+    let exists : boolean = false;
+    if(this.agendaList.length>0){
+      this.agendaList.forEach( agenda => {
+        let list = Object.values(agenda);
+        // console.log('DFO: dato obtenido dia'+dd+' mes '+mmonth+' idAnno '+idAnno)
+        // console.log('DFO: dato lectura'+list[1]+' mes '+list[0]+' idAnno '+idAnno)
+        if (list[0]=== mmonth && list[1] === dd && list[5] === idAnno){
+          exists = true;
+          console.log('DFO: agenda existe')
+        }
+      });
     }
-    return false;
+    return exists
   }
+
+  recorreLista(){
+    for(let i = 0;i<this.agendaList.length;i++){
+      let obj = Object.values(this.agendaList[i])
+      console.log('DFO: '+obj)
+    }
+  }
+
   loadOptions(){
     this.showOptions = true;
   }
 
-  saveTolist() {
+  saveToList() {
     // funcion que almacena las agendas en una lista interna
+    console.log('DFO: guardando lista')
+    const daySplit = this.today.splitDate(this.daySelected);
+    const start = this.today.splitHour(this.startHour);
+    const end = this.today.splitHour(this.endHour);
+    const brStart = this.today.splitHour(this.breakStart);
+    const brEnd = this.today.splitHour(this.breakEnd);
+    const agObj1 = {
+      mes : parseInt(daySplit[1]),
+      dia : parseInt(daySplit[2]),
+      horaInicio : start,
+      horaTermino : brStart,
+      numrunMedico : this.medicLogged.numrunMedico,
+      idAnno : this.annoTrimestre.idAnno
+    }
+    const agObj2 = {
+      mes : parseInt(daySplit[1]),
+      dia : parseInt(daySplit[2]),
+      horaInicio : brEnd,
+      horaTermino : end,
+      numrunMedico : this.medicLogged.numrunMedico,
+      idAnno : this.annoTrimestre.idAnno
+    }
+    console.log('DFO: id_anno '+ this.annoTrimestre.idAnno)
+    this.agendaList.push(agObj1)
+    this.agendaList.push(agObj2)
   }
 
-  submitToDB(){
+  isHigherThanStart(){
+    let valid : boolean = false
+    const start = this.today.splitHour(this.startHour);
+    const end = this.today.splitHour(this.endHour);
+    const brStart = this.today.splitHour(this.breakStart);
+    const brEnd = this.today.splitHour(this.breakEnd);
+
+    let inicial = start.split(":").map(Number)
+    let middle = brStart.split(":").map(Number)
+    let midEnd = brEnd.split(":").map(Number)
+    let final = end.split(":").map(Number)
+
+    let ini = (inicial[0] * 3600) + (inicial[1] * 60) + inicial[2];
+    let mid1 = (middle[0] * 3600) + (middle[1] * 60) + middle[2];
+    let mid2 = (midEnd[0] * 3600) + (midEnd[1] * 60) + midEnd[2];
+    let en = (final[0] * 3600) + (final[1] * 60) + final[2];
+
+    if(ini>mid1 || ini>mid2 || ini>en || mid1>mid2 || mid1>en || mid2>en){
+      valid = true;
+    } else {
+      valid = false;
+    }
+    return valid
+  }
+
+  bloqueIsValid(){
+    if (this.tBloque>=10 && this.tBloque<=60){
+      return true
+    } else {
+      return false
+    }
+  }
+
+  async submitToDB(){
+    this.router.navigate(['/main-page-medic'])
+    return this.bd.insertNewAgenda(this.agendaList)
+    
     // funcion que guarda la lista nueva de agendas en la base de datos
   }
   async confirmAlert() {
@@ -108,6 +232,7 @@ export class MedicHoursPage implements OnInit {
         role : 'confirm',
         handler : ()=>{
           console.log("Confirmado");
+          this.submitToDB();
         }
       },
       {

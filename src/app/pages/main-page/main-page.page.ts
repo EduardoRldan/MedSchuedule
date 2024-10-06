@@ -16,6 +16,8 @@ export class MainPagePage implements OnInit {
   userLogged! : User;
   patientLogged! : Paciente;
   setHours : any = [];
+  loadReady : boolean = false;
+  hrsLoadReady : boolean = false;
   constructor(private storage : NativeStorage, private router:Router, private activatedroute : ActivatedRoute, private handler : ObjectHandlerService, 
     private bd : ServicebdService) { 
     this.getuser();
@@ -26,8 +28,18 @@ export class MainPagePage implements OnInit {
   }
 
   async getSchedule(run : number){
+    // resolver conflicto de lista
     console.log("DFO: Obteniendo citas medicas")
-    this.setHours = await this.bd.getScheduledHrs(run, 1);
+    await this.bd.getScheduledHrs(run, 1)
+    .then(async () =>{
+      await this.storage.getItem('activeSchedule')
+      .then((data) =>{
+        console.log('DFO: typeof data '+typeof(data))
+        let activeSchedule = Object.values(data);
+        this.setHours = activeSchedule;
+        console.log('DFO: Lista de horas creada')
+      }).catch(e => console.log('DFO: Fetch de horas medicas fallo: '+ JSON.stringify(e)))
+    })
   }
   async getuser(){
     await this.storage.getItem('userLogged').then(async (data) => {
@@ -40,7 +52,8 @@ export class MainPagePage implements OnInit {
           console.log('DFO: paciente encontrado');
           this.patientLogged = this.handler.createPatientObject(JSON.parse(data))
           await this.getSchedule(this.patientLogged.numrunPaciente)
-          console.log('DFO: paciente listo')
+          this.loadReady = true;
+          console.log('DFO: paciente listo'+ this.loadReady);
           })
         })
       })
