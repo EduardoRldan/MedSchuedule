@@ -6,6 +6,7 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlerttoastService } from './alerttoast.service';
 import { ObjectHandlerService } from './object-handler.service';
 import { EncoderService } from './encoder.service';
+import { CitaMedica } from '../classes/cita-medica';
 
 
 @Injectable({
@@ -396,7 +397,7 @@ export class ServicebdService {
   getAllMedics(){
     console.log('DFO: obteniendo medicos')
     let response = [];
-    return this.database.executeSql("SELECT med.numrun_medico AS numrun, med.dvrun_medico AS dv, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico AS nombre, med.id_esp AS id_esp, esp.nom_esp AS especialidad FROM medico med JOIN especialidad esp ON med.id_esp = esp.id_esp WHERE med.id_esp = esp.id_esp;",[])
+    return this.database.executeSql("SELECT med.numrun_medico AS numrun, med.dvrun_medico AS dv, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico AS nombre, med.id_esp AS id_esp, esp.nom_esp AS especialidad, med.tiempo_bloque as tiempo_bloque, med.box_medico as box_medico FROM medico med JOIN especialidad esp ON med.id_esp = esp.id_esp WHERE med.id_esp = esp.id_esp;",[])
     .then((res) => {
       if (res.rows.length>0){
         console.log('DFO: Query Passed :'+ res.rows.length)
@@ -407,7 +408,9 @@ export class ServicebdService {
             dvrunMedico : res.rows.item(i).dv,
             nombreMedico : res.rows.item(i).nombre,
             idEsp : res.rows.item(i).id_esp,
-            especialidad : this.ec.convertStringUTF8(res.rows.item(i).especialidad)
+            especialidad : this.ec.convertStringUTF8(res.rows.item(i).especialidad),
+            tiempoBloque : res.rows.item(i).tiempo_bloque,
+            boxMedico : res.rows.item(i).box_medico
           }
           response.push(medico);
         }
@@ -543,23 +546,13 @@ export class ServicebdService {
     // OJO: no entrega los pacientes a los que pertenece
     // solo entrega si estan activas
     let response = [];
-    let obj = {
-      mes : 0,
-      dia : 0,
-      anno : 0,
-      hora : ""
-    }
+    let obj : CitaMedica;
     return this.database.executeSql('SELECT * FROM cita_medica WHERE numrun_medico=? and id_estado=1 ;',[numrun])
     .then((res) =>{
       if(res.rows.length>0){
         console.log('DFO: citas encontradas');
         for(let i = 0; i<res.rows.length;i++){
-          obj = {
-            mes : res.rows.item(i).mes_cita,
-            dia : res.rows.item(i).dia_cita,
-            anno : res.rows.item(i).anno_cita,
-            hora : res.rows.item(i).hora_cita
-          }
+          obj = new CitaMedica(res.rows.item(i).mes_cita, res.rows.item(i).dia_cita, res.rows.item(i).anno_cita, res.rows.item(i).hora_cita)
           response.push(obj);
         }
         this.storage.setItem('citas'+numrun,response);

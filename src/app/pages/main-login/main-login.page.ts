@@ -63,7 +63,13 @@ export class MainLoginPage implements OnInit, OnDestroy {
   }
 
   async getCount(){
-    this.bd.getAllUsers();
+    this.bd.database.executeSql('SELECT * FROM cita_medica;',[])
+      .then((res) => {
+        for(let i = 0; i<res.rows.length;i++){
+          console.log('DFO datos: '+ res.rows.item(i).numrun_paciente +'-'+res.rows.item(i).numrun_medico+'-'+res.rows.item(i).hora_cita)
+        }
+        
+      }).catch(e => console.log('DFO Error: '+JSON.stringify(e)))
   }
 
   redirectToPage(role : number){

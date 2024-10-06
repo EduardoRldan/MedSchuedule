@@ -59,6 +59,7 @@ export class MainPagePage implements OnInit {
       })
     }
   }
+ 
 
   // goToPage(route:string){
   //   let navExtras : NavigationExtras = {

@@ -68,6 +68,43 @@ export class TodayDateService {
     return strHour[1];
   }
 
+  timeToSS(hr : string){
+    // devuelve una hora en segundos
+    const timeArr = hr.split(':')
+    let hrMs = parseInt(timeArr[0]) * 3600;
+    let minMs = parseInt(timeArr[1]) *60;
+    let ssMs = parseInt(timeArr[2])
+    return hrMs + minMs + ssMs
+  }
+
+  timeToMs(date : string){
+    // convierte una fecha puesta en string en una cantidad de milisegundos
+    const dateObj = new Date(date);
+    const time = dateObj.getTime();
+    return time;
+  }
+
+
+  parseTimeToStr(date : Date){
+    const hour = date.getHours();
+    const min = date.getMinutes();
+    let minStr = min.toString();
+    if (min < 10) {
+      minStr = "0" + min.toString();
+    }
+    const hrStr = hour.toString() + ":" + minStr;
+    return hrStr;
+  }
+
+  createMinBlocks(date1 : string, date2 : string, timeBlock : number){
+    // toma dos fechas y las divide por el tamaño en minutos del bloque
+    // devuelve la cantidad de bloques a crear
+    const dateObj1 = new Date(date1)
+    const dateObj2 = new Date(date2)
+    const blocks = (dateObj2.getTime() - dateObj1.getTime()) / (timeBlock*60000);
+    return blocks
+  }
+
   todayIso(){
     return new Date(Date.now()).toISOString()
   }

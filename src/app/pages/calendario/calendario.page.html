@@ -22,35 +22,28 @@
       (ionChange)="showList(selectedDate)"></ion-datetime>
     </ion-card-content>
   </ion-card>
-  <ion-list *ngIf="hideList==false" lines="full">
+  <ion-list class="item-list" *ngIf="hideList==false" lines="full">
     <ion-list-header>
       <h3>{{dateStr}}</h3>
     </ion-list-header>
-    <ion-item *ngIf="!dayExists(selectedDate)">
+    <ion-item *ngIf="!dayExists(selectedDate) || citasDisponibles.length==0">
       <ion-label>No hay horas para este día</ion-label>
     </ion-item>
-    <ion-item *ngIf="dayExists(selectedDate)">
-      <ion-label>Hay horas</ion-label>
-    </ion-item>
-    <ion-item *ngFor="let block of hourList; index as i">
-      <!-- <ion-label>{{block.hora}}</ion-label>
-      <ion-label>Disponible</ion-label>
-      <ion-button (click)="confirmAlert(dateStr,block.hora)" fill="clear" slot="end">
-        <ion-icon name="add-circle-outline"></ion-icon>
-      </ion-button> -->
-      <div *ngIf="block.disponible==true; then bloqueLibre else bloqueOcupado"></div>
-        <ng-template #bloqueLibre>
-          <ion-label>{{block.hora}}</ion-label>
-          <ion-label>Disponible</ion-label>
-          <ion-button (click)="confirmAlert(dateStr,block.hora, medicObj.nombre)" fill="clear" slot="end">
+    <ng-container *ngIf="dayExists(selectedDate) && citasDisponibles.length>0">
+      <ion-item lines="full" class="item-list">
+        <ion-label>Hora</ion-label>
+        <ion-label>N° Box</ion-label>
+        <ion-icon slot="end" name="caret-down-outline"></ion-icon>
+      </ion-item>
+      <ng-container *ngFor="let cita of citasDisponibles">
+        <ion-item lines="full" class="item-list">
+          <ion-label>{{ cita.hora }}</ion-label>
+          <ion-label>{{ medicObj.boxMedico }}</ion-label>
+          <ion-button (click)="confirmAlert(dateStr, cita.hora, medicObj.nombreMedico, medicObj.boxMedico, cita)" fill="clear" slot="end">
             <ion-icon size="large" name="add-circle-outline"></ion-icon>
           </ion-button>
-        </ng-template>
-        <ng-template #bloqueOcupado>
-          <ion-label>{{block.hora}}</ion-label>
-          <ion-label>Ocupado</ion-label>
-          <ion-icon slot="end" name="close-outline"></ion-icon>
-        </ng-template>
-    </ion-item>
+        </ion-item>
+      </ng-container>
+    </ng-container>
   </ion-list>
 </ion-content>

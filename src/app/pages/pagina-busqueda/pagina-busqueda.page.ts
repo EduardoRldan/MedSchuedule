@@ -88,6 +88,6 @@ export class PaginaBusquedaPage implements OnInit {
         medicObj : medicObj
       }
     }
-    this.router.navigate(['/calendario'], navigationextras)
+    this.router.navigate(['/tab-paciente/calendario'], navigationextras)
   }
 }
