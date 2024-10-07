@@ -94,7 +94,9 @@ export class ServicebdService {
   insertsReady : boolean = false;
   // creacion de tablas
   private isDBReady : BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private isLoginValid : BehaviorSubject<boolean> = new BehaviorSubject(false);
   dbReady$ = this.isDBReady.asObservable();
+  loginValid$ = this.isLoginValid.asObservable();
   private gotId! : number;
 
   constructor(private sqlite : SQLite, 
@@ -183,11 +185,11 @@ export class ServicebdService {
     this.insertsReady = ready;
   }
 
-  async getUser(email : string, pw : string){
+  getUser(email : string, pw : string){
     let response = {};
-    let isValid = false;
+    //let isValid = false;
     let query = "SELECT * FROM user WHERE email='"+ email + "' AND  pw='"+ pw + "';";
-    await this.database.executeSql(query,[])
+    return this.database.executeSql(query,[])
     .then((res) => {
       console.log('Query passed. Length: '+res.rows.length);
       if (res.rows.length>0){
@@ -200,21 +202,21 @@ export class ServicebdService {
           fotoPerfil : res.rows.item(0).foto_perfil,
           idRole : res.rows.item(0).id_role
         }
-        isValid = true;
+        //isValid = true;
         this.storage.setItem("userLogged", JSON.stringify(response));
+        this.isLoginValid.next(true);
       }
     }).catch((e) => {
       this.toast.presentToast('Error al cargar usuario: '+ JSON.stringify(e))
     });
-    return isValid;
   }
 
-  async getMedic(idUser : number){
+  getMedic(idUser : number){
     // metodo que obtiene los datos del medico cuando este se loguea
     // solo se usa si el medico es quien se loguea
     let response = {};
     let query = "SELECT * FROM medico WHERE id_user ='"+ idUser + "';";
-    await this.database.executeSql(query,[])
+    return this.database.executeSql(query,[])
     .then((res) =>{
       if (res.rows.length>0){
         console.log("DFO: medico existe");
@@ -233,7 +235,7 @@ export class ServicebdService {
         }
         this.storage.setItem('medicLogged', JSON.stringify(response))
       }else {
-        console.log("DFO: Medico no existe")
+        console.log("DFO bd: Medico no existe")
       }
       //return this.handler.createMedicObject(response);
     })
@@ -328,10 +330,10 @@ export class ServicebdService {
     })
   };
 
-  async getPaciente(idUser : number){
+  getPaciente(idUser : number){
     let response = {};
     let query = "SELECT * FROM paciente WHERE id_user ='"+ idUser + "';";
-    await this.database.executeSql(query,[])
+    return this.database.executeSql(query,[])
     .then((res) => {
       if(res.rows.length>0){
         console.log('DFO: paciente existe');
@@ -353,19 +355,20 @@ export class ServicebdService {
   }
 
   async getScheduledHrs(numrunPaciente : number, estado : number){
-    const query = "SELECT cita.id_cita AS id, cita.dia_cita AS dia, cita.mes_cita AS mes, cita.anno_cita AS anno, cita.id_estado, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico as nombre_medico FROM cita_medica cita JOIN medico med ON cita.numrun_medico = med.numrun_medico WHERE numrun_paciente="+numrunPaciente+" AND id_estado="+ estado +";";
+    const query = "SELECT cita.id_cita AS id, cita.dia_cita AS dia, cita.mes_cita AS mes, cita.anno_cita AS anno, cita.hora_cita AS hora, cita.id_estado, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico as nombre_medico FROM cita_medica cita JOIN medico med ON cita.numrun_medico = med.numrun_medico WHERE numrun_paciente="+numrunPaciente+" AND id_estado="+ estado +";";
     let response = []
     await this.database.executeSql(query,[])
     .then((res) =>{
       if (res.rows.length>0){
         for (let i=0; i< res.rows.length; i++){
           let scheduleHr = {
-            idCita : res.rows.item(i).id_cita,
-            fecha : res.rows.item(i).dia_cita + "/"+ res.rows.item(i).mes_cita+"/"+res.rows.item(i).dia_cita,
-            hora : res.rows.item(i).hora_cita,
+            idCita : res.rows.item(i).id,
+            fecha : res.rows.item(i).dia + "/"+ res.rows.item(i).mes+"/"+res.rows.item(i).anno,
+            hora : res.rows.item(i).hora,
             estado : res.rows.item(i).id_estado,
-            numrunMedico : res.rows.item(i).numrun_medico
+            nombreMedico : res.rows.item(i).nombre_medico
           }
+          console.log('DFO: hora '+scheduleHr.hora)
           response.push(scheduleHr);
           console.log('DFO: Hay citas')
         }
@@ -423,19 +426,16 @@ export class ServicebdService {
   }
   /// METODOS RELACIONADOS A agenda_medica
   getAnoTrimestre(){
+    console.log('DFO: bd.getAnoTrimestre');
     let meses: Array<number> = []
     return this.database.executeSql('SELECT a.id_anno AS id, a.anno AS anno, a.id_trimestre AS id_trimestre, m.id_mes AS mes FROM anno a LEFT JOIN mes m ON a.id_trimestre = m.id_trimestre WHERE m.id_trimestre = a.id_trimestre',[])
     .then(res => {
       if (res.rows.length>0){
         // console.log('DFO: LARGO LISTA: '+res.rows.length)
         for (let i= 0; i<res.rows.length;i++){
-          // console.log('DFO: id '+ res.rows.item(i).id)
-          // console.log('DFO: anno '+ res.rows.item(i).anno)
-          // console.log('DFO: idtrimestre '+ res.rows.item(i).id_trimestre)
           let mes = res.rows.item(i).mes;
           meses.push(mes);
         }
-        
         let obj = {
           idAnno : res.rows.item(0).id,
           anno : res.rows.item(0).anno,
@@ -492,8 +492,9 @@ export class ServicebdService {
     return this.database.executeSql('SELECT am.mes_agenda AS mes_agenda, am.dia_agenda AS dia_agenda, am.hora_inicio AS hora_inicio, am.hora_termino AS hora_termino, am.numrun_medico AS numrun_medico, am.id_anno AS id_anno FROM agenda_medica am JOIN anno y ON am.id_anno = y.id_anno WHERE am.numrun_medico=? AND y.anno=? ;',[numrun, year])
     .then((res) => {
       if(res.rows.length>0) {
-        console.log('DFO: agendas encontradas')
+        //console.log('DFO: agendas encontradas')
         for(let i=0; i<res.rows.length;i++){
+        //console.log('DFO: getAgendaWithYear mes '+res.rows.item(i).mes_agenda+' dia '+ res.rows.item(i).dia_agenda +' horaI '+res.rows.item(i).hora_inicio+' horaT '+ res.rows.item(i).hora_termino);
           obj = {
             mes : res.rows.item(i).mes_agenda,
             dia : res.rows.item(i).dia_agenda,
@@ -502,7 +503,7 @@ export class ServicebdService {
             numrunMedico : res.rows.item(i).numrun_medico,
             idAnno : res.rows.item(i).id_anno
           }
-          console.log('DFO: empujando '+res.rows.item(i).mes_agenda)
+          //console.log('DFO: empujando '+res.rows.item(i).mes_agenda)
           response.push(obj);
         }
         //console.log()
@@ -510,27 +511,37 @@ export class ServicebdService {
       }
     })
   }
+
+  testingNewAgenda(lista : Array<object>){
+    console.log('DFO PROBANDO LISTAS')
+    for(let agenda of lista){
+      let val = Object.values(agenda);
+      console.log('DFO: mes: '+val[0]+' dia '+val[1]+' horaI '+val[2]+' horaT '+val[3])
+    }
+  }
+  
   insertNewAgenda(lista : Array<object>){
     console.log('DFO: guardando agenda');
     let indicator = 0;
     let exists : boolean;
     for(let i = 0; i<lista.length; i++){
       let values = Object.values(lista[i]);
-      console.log('DFO: dia_mes '+values)
+      console.log('DFO: mes: '+values[0]+' dia '+values[1]+' horaI '+values[2]+' horaT '+values[3]+' idx: '+i);
+      //console.log('DFO: dia_mes '+values)
       this.database.executeSql('SELECT * FROM agenda_medica WHERE mes_agenda=? AND dia_agenda=? AND hora_inicio=? AND hora_termino=? AND numrun_medico=? AND id_anno=?',[values[0],values[1],values[2],values[3],values[4],values[5]])
       .then((res) =>{
         if(res.rows.length>0){
           exists = true
           console.log('DFO agenda existe')
-          console.log('DFO UPDATE datos '+values[0]+ ' '+values[1] + ' '+' '+values[2] + ' '+' '+values[3] + ' '+' '+values[4] + ' '+ values[5])
+          //console.log('DFO UPDATE datos '+values[0]+ ' '+values[1] + ' '+' '+values[2] + ' '+' '+values[3] + ' '+' '+values[4] + ' '+ values[5])
           return this.database.executeSql('UPDATE agenda_medica SET mes_agenda=?, dia_agenda=?, hora_inicio=?, hora_termino=? WHERE numrun_medico=? AND id_anno=? ;',
             [values[0],values[1],values[2],values[3],values[4],values[5]])
             .then(() => {
               this.toast.presentToast('Agenda actualizada '+ i)
             }).catch ((e) => this.toast.presentToast('Ha ocurrido un error al enviar la agenda. '+JSON.stringify(e)));
-        } else{
+        } else {
           console.log('DFO:  agenda no existe')
-          console.log('DFO INSERT datos '+values[0]+ ' '+values[1] + ' '+' '+values[2] + ' '+' '+values[3] + ' '+' '+values[4] + ' '+ values[5])
+          //console.log('DFO INSERT datos '+values[0]+ ' '+values[1] + ' '+' '+values[2] + ' '+' '+values[3] + ' '+' '+values[4] + ' '+ values[5])
           exists = false
           return this.database.executeSql('INSERT INTO agenda_medica(mes_agenda, dia_agenda, hora_inicio, hora_termino, numrun_medico, id_anno) VALUES(?, ?, ?, ?, ?, ?)',
             [values[0],values[1],values[2],values[3],values[4],values[5]])

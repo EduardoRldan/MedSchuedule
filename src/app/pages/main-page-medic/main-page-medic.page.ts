@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, ActivationStart, Router, RouterOutlet } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { Medic } from 'src/app/classes/medic';
 import { User } from 'src/app/classes/user';
@@ -19,32 +18,20 @@ export class MainPageMedicPage implements OnInit {
   medicLogged! : Medic;
   loadReady : boolean = false;
   constructor(private storage : NativeStorage, 
-    private handler : ObjectHandlerService, 
-    private bd : ServicebdService, 
-    private router : Router,
-    private route : ActivatedRoute) { }
+    private handler : ObjectHandlerService) { }
 
   ngOnInit() {
     this.storage.getItem('userLogged').then((data) =>{
       console.log("DFO: Usuario logueado")
       this.userLogged = this.handler.createUserObject(data);
-      let idUs = this.userLogged.idUser;
-      this.bd.getMedic(idUs)
-      .then(()=> {
-        this.storage.getItem('medicLogged')
+      this.storage.getItem('medicLogged')
         .then((data)=>{
           console.log('DFO: Medico encontrado')
           this.medicLogged = this.handler.createMedicObject(JSON.parse(data))
           this.loadReady=true;
+        }).catch(e => {
+          console.log('DFO: Error obteniendo de storage')
         })
-      })
     });
-  }
-
-  irAPacientes(){
-    if (this.router.url !== '/tab-medico/patient-list'){
-      this.router.navigate(['/tab-medico/patient-list'], {replaceUrl : true})
-    }
-    
   }
 }

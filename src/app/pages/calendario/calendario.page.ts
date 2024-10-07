@@ -13,7 +13,15 @@ import { TodayDateService } from 'src/app/services/today-date.service';
   styleUrls: ['./calendario.page.scss'],
 })
 export class CalendarioPage implements OnInit {
-  medicObj : any;
+  medicObj : any = {
+    numrunMedico : 0,
+    dvrunMedico : "",
+    nombreMedico : "",
+    idEsp : 0,
+    especialidad : "",
+    tiempoBloque : 0,
+    boxMedico : ""
+  };
   user : any;
   listaCitas : Array<CitaMedica> = [];  // almacena las citas tomadas del medico
   citasDisponibles : Array<CitaMedica> = [];  // almacena los bloques de citas disponibles
@@ -34,47 +42,61 @@ export class CalendarioPage implements OnInit {
   hideList : boolean = true;
   takenHrs : any;
   // testing
-  listaFalsa: any = [1,2,3,4,5,6,7,8,9,10]
   
   constructor(
-    private router:Router, 
-    private activatedroute:ActivatedRoute,
     private alertController : AlertController,
     private today : TodayDateService,
     private bd : ServicebdService,
     private stroage : NativeStorage,
     private alert : AlertService) { 
-    this.activatedroute.queryParams.subscribe( param => {
-      if(this.router.getCurrentNavigation()?.extras.state){
-        this.medicObj = this.router.getCurrentNavigation()?.extras?.state?.['medicObj'];
-      }
-    });
-    
+      // como esto solo se activa una vez, se vuelve a llamar desde ionWillEnter
+      this.loadData();
   }
 
   ngOnInit() {
+  }
+
+  ionViewWillEnter(){
+    this.loadData();
+  }
+
+  ionViewDidLeave(){
+    this.hideList = true;
+  }
+  
+  loadData(){
+    console.log('DFO: cargando datos');
     this.minDate = this.today.todayDate();
     this.selectedDate = this.minDate;
     let split = this.today.splitDate(this.minDate);
-    this.bd.getAgendaWithYear(this.medicObj.numrunMedico, parseInt(split[0]))
-    .then(()=>{
-      this.stroage.getItem('agenda'+this.medicObj.numrunMedico)
-      .then((data) => {
-        let list: Array<object> = Object.values(data)
-        this.agendaList = list;
-        this.bd.getCitasMedicasMedico(this.medicObj.numrunMedico)
-        .then(() =>{
-          this.stroage.getItem('citas'+this.medicObj.numrunMedico)
-          .then(data => {
-            console.log('DFO: Obteniendo citas')
-            let list: Array<CitaMedica> = Object.values(data)
-            this.listaCitas = list;
-          }).catch(e => {
-            this.listaCitas = [];
+    // aqui empiezan las promesas
+    this.stroage.getItem('medicSelected')
+    .then((data) => {
+      //console.log('DFO: dato encontrado '+JSON.stringify(data))
+      this.medicObj = data;
+      this.bd.getAgendaWithYear(this.medicObj.numrunMedico, parseInt(split[0]))
+      .then(()=>{
+        this.stroage.getItem('agenda'+this.medicObj.numrunMedico)
+        .then((data) => {
+          let list: Array<object> = Object.values(data)
+          this.agendaList = list;
+          this.bd.getCitasMedicasMedico(this.medicObj.numrunMedico)
+          .then(() =>{
+            this.stroage.getItem('citas'+this.medicObj.numrunMedico)
+            .then(data => {
+              //console.log('DFO: Obteniendo citas')
+              let list: Array<CitaMedica> = Object.values(data)
+              this.listaCitas = list;
+            }).catch(e => {
+              this.listaCitas = [];
+            })
           })
+        }).catch(e => {
+          console.log('DFO: no hay citas')
+          this.agendaList = [];
         })
       })
-    })
+    }).catch(e => console.log('DFO: error obteniendo medico '+JSON.stringify(e)))
   }
 
   dayExists(day: string){
@@ -115,7 +137,6 @@ export class CalendarioPage implements OnInit {
       });
     }
     return daysAvailable
-
   }
 
   createListaCitas(day : string){
@@ -128,26 +149,28 @@ export class CalendarioPage implements OnInit {
     let cita : CitaMedica; 
 
     let listaBloques : Array<CitaMedica> = []
-
-    if (this.agendaList.length>0){
-      this.agendaList.forEach( agenda => {
-        let list = Object.values(agenda);
-        if(list[0] == mes && list[1] == dia){
-          let dateStrStart = splitDay[0]+'-'+splitDay[1]+'-'+splitDay[2]+'T'+list[2];
-          let dateStrEnd = splitDay[0]+'-'+splitDay[1]+'-'+splitDay[2]+'T'+list[3];
-          let blocks = this.today.createMinBlocks(dateStrStart,dateStrEnd,this.medicObj.tiempoBloque)
-          let sumMinutes = this.today.timeToMs(dateStrStart)
-          for (let i = 0; i<blocks;i++){
-            let minToStr = this.today.parseTimeToStr(new Date(sumMinutes))
-            console.log('DFO: bloque cita: '+'mes'+'-'+dia+'-'+minToStr);
-            sumMinutes += this.medicObj.tiempoBloque*60000
-            cita = new CitaMedica(mes, dia, anno, minToStr);
-            listaBloques.push(cita);
+    if (this.agendaList != listaBloques){
+      if (this.agendaList.length>0){
+        console.log('DFO: hay elementos en la lista')
+        this.agendaList.forEach( agenda => {
+          let list = Object.values(agenda);
+          if(list[0] == mes && list[1] == dia){
+            let dateStrStart = splitDay[0]+'-'+splitDay[1]+'-'+splitDay[2]+'T'+list[2];
+            let dateStrEnd = splitDay[0]+'-'+splitDay[1]+'-'+splitDay[2]+'T'+list[3];
+            let blocks = this.today.createMinBlocks(dateStrStart,dateStrEnd,this.medicObj.tiempoBloque)
+            let sumMinutes = this.today.timeToMs(dateStrStart)
+            for (let i = 0; i<blocks;i++){
+              let minToStr = this.today.parseTimeToStr(new Date(sumMinutes))
+              //console.log('DFO: bloque cita: '+'mes'+'-'+dia+'-'+minToStr);
+              sumMinutes += this.medicObj.tiempoBloque*60000
+              cita = new CitaMedica(mes, dia, anno, minToStr);
+              listaBloques.push(cita);
+            }
           }
-          this.verifyLists(listaBloques, this.listaCitas);
-        }
-      })
+        })
+      }
     }
+    this.verifyLists(listaBloques, this.listaCitas);
   }
 
   verifyLists(bloques : Array<CitaMedica>, citas : Array<CitaMedica>){
@@ -158,16 +181,33 @@ export class CalendarioPage implements OnInit {
         citas.forEach(cita => {
           let bloqValues = Object.values(bloq);
           let citaValues = Object.values(cita);
-          console.log('DFO: buscando en listas')
-          if(bloqValues[0] != citaValues[0] && bloqValues[1] != citaValues[1] && bloqValues[2] != citaValues[2] && bloqValues[3] != citaValues[3]){
-            console.log('DFO: verifyLists : no existe una coincidencia');
+          let bloqOb = {
+            mes : bloqValues[0],
+            dia : bloqValues[1],
+            anno : bloqValues[2],
+            hora : bloqValues[3] + ":00"
+          }
+          let citaOb = {
+            mes : citaValues[0],
+            dia : citaValues[1],
+            anno : citaValues[2],
+            hora : citaValues[3]
+          }
+          //console.log('DFO: citaOb dia:'+citaOb.dia+' mes:'+citaOb.mes+' hora:'+citaOb.hora);
+          //console.log('DFO: bloqOb dia:'+bloqOb.dia+' mes:'+bloqOb.mes+' hora:'+bloqOb.hora);
+          if(citaOb.hora != bloqOb.hora && citaOb.mes == bloqOb.mes && citaOb.dia == bloqOb.dia && citaOb.anno == bloqOb.anno){
+            //console.log('DFO: empujando a prelista')
+            // lo que hace es comparar las horas de cada cita por día
             preLista.push(bloq)
           }
+          // if(bloqValues[0] != citaValues[0] && bloqValues[1] != citaValues[1] && bloqValues[2] != citaValues[2] && bloqValues[3] != citaValues[3]){
+          //   console.log('DFO: verifyLists : no existe una coincidencia');
+          //   preLista.push(bloq)
+          // }
         })
       })
     } else {
       this.citasDisponibles = bloques;
-      
     }
     if(preLista.length==0){
       this.citasDisponibles = bloques;
@@ -195,11 +235,11 @@ export class CalendarioPage implements OnInit {
       }
       this.bd.insertCitaMedica(citaObj)
       .then(() =>{
+        this.stroage.remove('agenda'+this.medicObj.numrunMedico) // elimina la lista de agendas del medico para que la cache no la intente volver a sumar
+        this.stroage.remove('citas'+this.medicObj.numrunMedico) // elimina la lista de citas medicas del doctor para que la cache no la intente volver a llenar
         this.alert.alertNavigation('/tab-paciente/main-page','Hora agendada','Su hora ha sido agendada, recibirá un email con más información.')
       })
     })
-    
-    
   }
 
   async confirmAlert(day : string, hour : string, medicName : string, box : string, citaObj : CitaMedica){
@@ -221,28 +261,5 @@ export class CalendarioPage implements OnInit {
         }]
       });
     await alert.present();
-  }
-
-  async saveDate(svDay : string, svHr : string, medicName : string){
-    const alert = await this.alertController.create(
-      {
-        header : "Su hora ha sido confirmada",
-        message : "Recibirá un mensaje en su correo electrónico con la información de su hora médica. Puede revisar su hora agendada en el Inicio",
-        buttons : ['Aceptar']
-      }
-    );
-    await alert.present();
-    let navigationextras : NavigationExtras = {
-      state : {
-        dateSaved : {
-          day : svDay,
-          hour : svHr,
-          medic : medicName
-        },
-        user : this.user
-      }
-    }
-    this.router.navigate(['/tab-paciente/main-page'], navigationextras);
-    this.selectedDate = "";
   }
 }

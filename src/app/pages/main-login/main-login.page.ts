@@ -7,7 +7,6 @@ import { User } from 'src/app/classes/user';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
 import { BehaviorSubject } from 'rxjs';
-import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-main-login',
@@ -21,8 +20,11 @@ export class MainLoginPage implements OnInit, OnDestroy {
   loginForm : any;
   thisUser! : User;
   isDbReady: boolean = false;
+  isLoginValid : boolean = false;
   private loginReady : BehaviorSubject<boolean> = new BehaviorSubject(false);
   private role : BehaviorSubject<number> = new BehaviorSubject(-1);
+  private idus : BehaviorSubject<number> = new BehaviorSubject(0)
+  idUserFetched = this.idus.asObservable();
   roleFetched = this.role.asObservable();
   isLoggedIn = this.loginReady.asObservable();
 
@@ -45,11 +47,16 @@ export class MainLoginPage implements OnInit, OnDestroy {
       if(ready){
         this.roleFetched.subscribe(n =>{
           if(n>0){
-
-            this.redirectToPage(n)
+            this.idUserFetched.subscribe(i =>{
+              this.redirectToPage(n,i);
+            })
+            
           }
         })
       }
+    })
+    this.storage.clear().then(() => {
+      this.toast.presentToast('Sesiones limpias')
     })
   }
   ngOnDestroy() {
@@ -72,15 +79,19 @@ export class MainLoginPage implements OnInit, OnDestroy {
       }).catch(e => console.log('DFO Error: '+JSON.stringify(e)))
   }
 
-  redirectToPage(role : number){
+  redirectToPage(role : number, idUser : number){
     console.log("DFO: redireccionando con role: "+role)
 
     switch(role){
       case 1:
-        this.router.navigate(['/tab-paciente/main-page']);
+        this.bd.getPaciente(idUser).then(() =>{
+          this.router.navigate(['/tab-paciente/main-page']);
+        })
         break;
       case 2:
-        this.router.navigate(['/tab-medico/main-page-medic']);
+        this.bd.getMedic(idUser).then(() =>{
+          this.router.navigate(['/tab-medico/main-page-medic']);
+        })
         break;
       case 3:
         this.toast.presentToast('Usted es admin');
@@ -94,18 +105,28 @@ export class MainLoginPage implements OnInit, OnDestroy {
     let user = {};
     let values = [];
     //let validUser : boolean;
-    if (await this.bd.getUser(userInput, pwInput)){
-      await this.storage.getItem("userLogged").then((data)=> {
-        user = JSON.parse(data);
-        values = Object.values(user);
-        let idRole = values[4] as number;
-        this.role.next(idRole);
-        this.loginReady.next(true);
-        this.toast.presentToast('Sesión iniciada correctamente');
+    await this.bd.getUser(userInput, pwInput)
+    .then(() =>{
+      this.bd.loginValid$.subscribe(async isReady => {
+        this.isLoginValid = isReady;
+        if(this.isLoginValid){
+          await this.storage.getItem("userLogged").then((data)=> {
+            user = JSON.parse(data);
+            values = Object.values(user);
+            let idRole = values[4] as number;
+            let idUser = values[0] as number;
+            this.role.next(idRole);
+            this.idus.next(idUser)
+            this.loginReady.next(true);
+            this.toast.presentToast('Sesión iniciada correctamente');
+          }).catch(e => {
+            console.log('DFO: Error al obtener usuario' + JSON.stringify(e))
+          })
+        }else{
+          this.toast.presentToast('Usuario o contraseña incorrectos')
+        }
       })
-    } else {
-      this.toast.presentToast('Usuario o contraseña incorrectos')
-    }
+    })
   }
   
       

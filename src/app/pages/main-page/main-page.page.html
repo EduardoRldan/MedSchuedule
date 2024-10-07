@@ -12,11 +12,11 @@
     </ion-card-header>
     <ng-container *ngIf="setHours.length!=0">
       <ion-card-content *ngFor="let hr of setHours">
-        <ion-item>
+        <ion-item lines="full" class="item-list">
           <ion-icon slot="start" name="calendar-outline"></ion-icon>
-          <ion-label><b>{{hr.day}}</b></ion-label>
-          <ion-label style="text-align: center;">{{hr.hour}}</ion-label>
-          <ion-label>Dr. {{hr.medic}}</ion-label>
+          <ion-label><b>{{hr.fecha}}</b></ion-label>
+          <ion-label style="text-align: center;">{{hr.hora}}</ion-label>
+          <ion-label>Dr. {{hr.nombreMedico}}</ion-label>
         </ion-item>
       </ion-card-content>
     </ng-container>

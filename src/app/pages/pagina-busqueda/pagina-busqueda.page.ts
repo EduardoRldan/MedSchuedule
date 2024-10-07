@@ -34,6 +34,10 @@ export class PaginaBusquedaPage implements OnInit {
   ngOnInit() {
     this.getMedicList();
   }
+
+  ionViewDidLeave(){
+    this.filteredList = [];
+  }
   
   async getMedicList(){
     await this.bd.getAllMedics()
@@ -82,12 +86,10 @@ export class PaginaBusquedaPage implements OnInit {
     this.filteredList = result;
   }
 
-  redirect(medicObj:any) {
-    let navigationextras : NavigationExtras = {
-      state : {
-        medicObj : medicObj
-      }
-    }
-    this.router.navigate(['/tab-paciente/calendario'], navigationextras)
+  async redirect(medicObj:any) {
+    await this.storage.setItem('medicSelected',medicObj)
+    .then(()=>{
+      this.router.navigate(['/tab-paciente/calendario']);
+    })
   }
 }

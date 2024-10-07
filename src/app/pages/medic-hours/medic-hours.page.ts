@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { Medic } from 'src/app/classes/medic';
+import { AlertService } from 'src/app/services/alert.service';
+import { AlerttoastService } from 'src/app/services/alerttoast.service';
 import { ObjectHandlerService } from 'src/app/services/object-handler.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 import { TodayDateService } from 'src/app/services/today-date.service';
@@ -58,35 +60,65 @@ export class MedicHoursPage implements OnInit {
   indicator : number = 0;
   constructor(
     private alertController : AlertController, 
-    private toastController : ToastController, 
     private today : TodayDateService,
     private bd : ServicebdService,
     private storage : NativeStorage,
     private handler : ObjectHandlerService,
-    private router : Router) { 
-      this.storage.getItem('medicLogged')
+    private alert : AlertService,
+    private toast : AlerttoastService,
+    private navCtrl : NavController) {
+    }
+
+  ngOnInit() {
+  }
+
+  ionViewWillEnter(){
+    // como es una pagina hija, es necesario que cargue los datos cada vez que entra a la pagina
+    // no es necesario declarar en el constructor porque la pagina de todas maneras cargará desde otra.
+    this.loadData();
+  }
+
+  ionViewDidLeave(){
+    this.showCalendar = false;
+    this.showOptions = false;
+  }
+
+  loadData(){
+    this.storage.getItem('medicLogged')
       .then((data)=>{
-        console.log('DFO: Medico encontrado')
+        //console.log('DFO: Medico encontrado')
         this.medicLogged = this.handler.createMedicObject(JSON.parse(data))
       })
       this.bd.getAnoTrimestre()
       .then(() =>{
         this.storage.getItem('annoTrimestre')
         .then((data)=> {
-          console.log('DFO: Datos obtenidos ')
+          //console.log('DFO: Datos obtenidos annoTrimestre')
           let obj = data;
           this.annoTrimestre = obj;
           this.bd.getAgenda(this.medicLogged.numrunMedico,this.annoTrimestre.idAnno)
           .then(() =>{
+            //console.log('DFO: agenda encontrada');
             this.storage.getItem('agendaLista')
             .then((data) => {
               let list: Array<object> = Object.values(data)
-              console.log('DFO: desde medic-hours '+list)
-              console.log('DFO: '+Object.values(list[0]))
+              //console.log('DFO: Obteniendo agenda');
+              for (let el of list){
+                let val = Object.values(el);
+                //console.log('DFO agendas mes'+val[0]+' dia '+val[1]+' horaI '+val[2]+' horaT '+val[3])
+              }
+              //console.log('DFO: desde medic-hours '+list)
+              //console.log('DFO: '+Object.values(list[0]))
               this.agendaList = list;
+            }).catch(e => {
+              //console.log('DFO: Error al cargar agenda '+JSON.stringify(e))
+              this.agendaList = [];
             })
+          }).catch(e => {
+            //console.log('DFO: Error obteniendo agenda' + JSON.stringify(e))
+            this.agendaList = [];
           })
-        })
+        }).catch(e => console.log('DFO: Error obteniendo añoTrimestre'))
       });
 
       this.defDate = this.today.tomorrowDate();
@@ -95,9 +127,6 @@ export class MedicHoursPage implements OnInit {
       this.endHour = this.defDate
       this.breakStart = this.defDate
       this.breakEnd = this.defDate
-    }
-
-  ngOnInit() {
   }
 
   loadCalendar(){
@@ -115,9 +144,10 @@ export class MedicHoursPage implements OnInit {
     this.daySelected = event.detail.value;
     this.showBtnOptions(this.daySelected)
   }
+
   showBtnOptions(day : string){
     // debe devolver un verdadero o falso si el día ya tiene su agenda o no respectivamente
-    console.log('DFO: daySelected '+this.daySelected)
+    //console.log('DFO: daySelected '+this.daySelected)
     if (this.valueChanged(this.previousSelect, day)){
       this.previousSelect = day;
       this.showOptions = false;
@@ -136,7 +166,7 @@ export class MedicHoursPage implements OnInit {
         // console.log('DFO: dato lectura'+list[1]+' mes '+list[0]+' idAnno '+idAnno)
         if (list[0]=== mmonth && list[1] === dd && list[5] === idAnno){
           exists = true;
-          console.log('DFO: agenda existe')
+          //console.log('DFO: agenda existe')
         }
       });
     }
@@ -178,9 +208,9 @@ export class MedicHoursPage implements OnInit {
       numrunMedico : this.medicLogged.numrunMedico,
       idAnno : this.annoTrimestre.idAnno
     }
-    console.log('DFO: id_anno '+ this.annoTrimestre.idAnno)
     this.agendaList.push(agObj1)
     this.agendaList.push(agObj2)
+    this.toast.presentToast('Agenda guardada. Al finalizar recuerde presionar "Subir Agenda" para activarlas.')
   }
 
   isHigherThanStart(){
@@ -217,7 +247,7 @@ export class MedicHoursPage implements OnInit {
   }
 
   async submitToDB(){
-    this.router.navigate(['/main-page-medic'])
+    this.alert.alertNavigation('/tab-medico/main-page-medic','Agendas guardadas','Su agenda ha sido actualizada, los pacientes podrán solicitar citas médicas.')
     return this.bd.insertNewAgenda(this.agendaList)
     
     // funcion que guarda la lista nueva de agendas en la base de datos
@@ -245,15 +275,5 @@ export class MedicHoursPage implements OnInit {
     });
 
     await alert.present();
-  }
-
-  async presentToast(msj : string) {
-    const toast = await this.toastController.create({
-      message: msj,
-      duration: 1500,
-      position: 'bottom',
-    });
-
-    await toast.present();
   }
 }

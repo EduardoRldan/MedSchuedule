@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { Paciente } from 'src/app/classes/paciente';
 import { User } from 'src/app/classes/user';
@@ -18,14 +17,24 @@ export class MainPagePage implements OnInit {
   setHours : any = [];
   loadReady : boolean = false;
   hrsLoadReady : boolean = false;
-  constructor(private storage : NativeStorage, private router:Router, private activatedroute : ActivatedRoute, private handler : ObjectHandlerService, 
+  constructor(
+    private storage : NativeStorage, 
+    private handler : ObjectHandlerService, 
     private bd : ServicebdService) { 
     this.getuser();
   }
 
   ngOnInit() {
-    //this.getSchedule(this.patientLogged.numrunPaciente)
   }
+
+  ionViewWillEnter(){
+    this.getSchedule(this.patientLogged.numrunPaciente);
+  }
+
+  ionViewDidLeave(){
+    this.setHours = [];
+  }
+
 
   async getSchedule(run : number){
     // resolver conflicto de lista
@@ -34,7 +43,6 @@ export class MainPagePage implements OnInit {
     .then(async () =>{
       await this.storage.getItem('activeSchedule')
       .then((data) =>{
-        console.log('DFO: typeof data '+typeof(data))
         let activeSchedule = Object.values(data);
         this.setHours = activeSchedule;
         console.log('DFO: Lista de horas creada')
@@ -44,10 +52,7 @@ export class MainPagePage implements OnInit {
   async getuser(){
     await this.storage.getItem('userLogged').then(async (data) => {
       this.userLogged = this.handler.createUserObject(data);
-      let idUs = this.userLogged.idUser;
-      await this.bd.getPaciente(idUs)
-      .then(async () =>{
-        await this.storage.getItem('patientLogged')
+      await this.storage.getItem('patientLogged')
         .then(async (data) => {
           console.log('DFO: paciente encontrado');
           this.patientLogged = this.handler.createPatientObject(JSON.parse(data))
@@ -56,26 +61,5 @@ export class MainPagePage implements OnInit {
           console.log('DFO: paciente listo'+ this.loadReady);
           })
         })
-      })
     }
   }
- 
-
-  // goToPage(route:string){
-  //   let navExtras : NavigationExtras = {
-  //     state : {
-  //       user : this.user
-  //     }
-  //   }
-  //   this.router.navigate([route],navExtras);
-  // }
-
-//   goToSchedule(route : string,hourList : any){
-//     let navExtras : NavigationExtras = {
-//       state : {
-//         list : hourList
-//       }
-//     }
-//     this.router.navigate([route],navExtras);
-//   }
-// }

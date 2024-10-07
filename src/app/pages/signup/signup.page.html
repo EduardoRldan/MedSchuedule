@@ -36,30 +36,36 @@
       </ion-item>
 
       <ion-label color="danger" *ngIf="this.signForm.get('run')!.touched && this.signForm.get('run')!.errors?.['required']">Debe llenar este campo</ion-label>
-      <ion-label color="danger" *ngIf="this.signForm.get('run')!.touched && this.signForm.get('run')!.errors?.['pattern']">RUN no es válido</ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('run')!.touched && this.signForm.get('run')!.errors?.['pattern']">RUN no es válido (Debe incluir guión)</ion-label>
       <ion-item class="input">
         <ion-input formControlName="run" labelPlacement="floating" label="RUN" placeholder="11222333-4"></ion-input>
       </ion-item>
 
-      <ion-label color="danger" *ngIf="this.signForm.get('email')!.touched && this.signForm.get('email')!.errors?.['required']">Debe llenar este campo</ion-label>
-      <ion-label color="danger" *ngIf="this.signForm.get('email')!.touched && this.signForm.get('email')!.errors?.['email']">Email no es válido</ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('email')!.touched && this.signForm.get('email')!.errors?.['required']">Debe llenar este campo<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('email')!.touched && this.signForm.get('email')!.errors?.['email']">Email no es válido<br></ion-label>
       <ion-item class="input">
         <ion-input formControlName="email" labelPlacement="floating" label="Correo" placeholder="alguien@correo.com"></ion-input>
       </ion-item>
 
-      <ion-label color="danger" *ngIf="this.signForm.get('phone')!.touched && this.signForm.get('phone')!.errors?.['required']">Debe llenar este campo</ion-label>
-      <ion-label color="danger" *ngIf="this.signForm.get('phone')!.touched && this.signForm.get('phone')!.errors?.['pattern']">Sólo use números</ion-label>
-      <ion-label color="danger" *ngIf="this.signForm.get('phone')!.touched && this.signForm.get('phone')!.errors?.['minlength']">El número no es válido</ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('phone')!.touched && this.signForm.get('phone')!.errors?.['required']">Debe llenar este campo<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('phone')!.touched && this.signForm.get('phone')!.errors?.['pattern']">Sólo use números<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('phone')!.touched && this.signForm.get('phone')!.errors?.['minlength']">El número no es válido<br></ion-label>
       <ion-item class="input">
         <ion-input formControlName="phone" labelPlacement="floating" label="Teléfono/Celular (+56)" placeholder="123456789"></ion-input>
       </ion-item>
 
-      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['required']">Debe llenar este campo</ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['required']">Debe llenar este campo<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['minLength8']">Debe tener al menos 8 caractéres<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['hasLettersAndNumbers']">Debe incluir al menos una letra y un número<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['noSpaces']">No debe incluir espacios</ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['noProhibitedCharacters']">No incluya caracteres especiales (Puede incluir -_.)<br></ion-label>
+      <ion-label color="danger" *ngIf="this.signForm.get('pw1')!.touched && this.signForm.get('pw1')!.errors?.['noLatinCharacters']">No incluya letras con tildes ni "ñ"<br></ion-label>
       <ion-item class="input">
         <ion-input formControlName="pw1" labelPlacement="floating" type="password" label="Contraseña" placeholder=""></ion-input>
       </ion-item>
 
       <ion-label color="danger" *ngIf="this.signForm.get('pw2')!.touched && this.signForm.get('pw2')!.errors?.['required']">Debe llenar este campo</ion-label>
+      <ion-label color="danger" *ngIf="signForm.errors?.['confirmPassword']">Las contraseñas deben coincidir</ion-label>
       <ion-item class="input">
         <ion-input formControlName="pw2" labelPlacement="floating" type="password" label="Repetir Contraseña" placeholder=""></ion-input>
       </ion-item>

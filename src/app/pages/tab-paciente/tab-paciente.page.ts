@@ -11,5 +11,8 @@ export class TabPacientePage implements OnInit {
 
   ngOnInit() {
   }
+  onTabChange(){
+    
+  }
 
 }
