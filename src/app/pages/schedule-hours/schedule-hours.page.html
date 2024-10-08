@@ -8,26 +8,27 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <h6 class="content-txt">Aquí puede encontrar sus consultas médicas agendadas.</h6>
+  <h6 class="content-txt">Aquí puede encontrar sus citas médicas agendadas.</h6>
   <ion-card class="card">
     <ion-card-content>
-      <ion-datetime
-        presentation="month-year"
-        [value]="defDate"
-        (ionChange)="showScheduledHrs(selectedDate)"
-        [(ngModel)]="selectedDate"></ion-datetime>
+      <ion-radio-group [(ngModel)]="selectedEstado" (ionChange)="filterList(selectedEstado)" [value]="selectedEstado">
+        <ion-radio value="1" labelPlacement="end">Activo</ion-radio><br />
+        <ion-radio value="3" labelPlacement="end">Finalizado</ion-radio><br />
+        <ion-radio value="2" labelPlacement="end">Cancelado</ion-radio><br />
+      </ion-radio-group>
     </ion-card-content>
   </ion-card>
-  <ion-list lines="full" *ngIf="hideList == false">
-    <ng-container *ngIf="hrsFound">
-      <ion-item *ngFor="let hr of setHours">
-        <ion-label><b>{{hr.day}}</b></ion-label>
-        <ion-label>{{hr.hour}}hrs.</ion-label>
-        <ion-label>Dr. {{hr.medic}}</ion-label>
+  <ion-list lines="full">
+    <ng-container *ngIf="filteredList">
+      <ion-item button detail="true" detail-icon="caret-forward-outline" (click)="showDetails(hr)" class="item-list" *ngFor="let hr of filteredList">
+        <ion-label><b>{{hr.dia}}/{{hr.mes}}/{{hr.anno}}</b></ion-label>
+        <ion-label>{{hr.hora}}hrs.</ion-label>
+        <ion-label>Dr. {{hr.nombreMedico}}</ion-label>
+        <ion-label slot="end">{{ stateVal(hr.estado) }}</ion-label>
       </ion-item>
     </ng-container>
-    <ng-container *ngIf="!hrsFound">
-      <ion-label><b>No tiene horas médicas este mes</b></ion-label>
+    <ng-container *ngIf="!filteredList">
+      <ion-label><b>No tiene horas médicas</b></ion-label>
     </ng-container>
   </ion-list>
 </ion-content>

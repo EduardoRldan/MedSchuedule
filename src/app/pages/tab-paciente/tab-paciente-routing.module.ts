@@ -32,6 +32,10 @@ const routes: Routes = [
       {
         path: 'user-profile',
         loadChildren: () => import('../user-profile/user-profile.module').then( m => m.UserProfilePageModule)
+      },
+      {
+        path: 'cita-details',
+        loadChildren: () => import('../cita-details/cita-details.module').then( m => m.CitaDetailsPageModule)
       }
     ]
   }

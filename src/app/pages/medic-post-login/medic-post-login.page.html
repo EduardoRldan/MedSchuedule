@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-
+  <!-- SOLO PARA DEBUGGING Y FRONT TESTING -->
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -18,17 +18,26 @@
       </ion-card-content>
     </ion-card>
   </div> -->
-  <ion-list class="item-list">
-    <ion-list-header>Hola</ion-list-header>
-    <ion-item lines="full" class="item-list">
-      <ion-label>Hola chau</ion-label>
-    </ion-item>
-    <ion-item lines="full" class="item-list">
-      <ion-label>Hola chau</ion-label>
-    </ion-item>
-    <ion-item lines="full" class="item-list">
-      <ion-label>Hola chau</ion-label>
-    </ion-item>
-  </ion-list>
+  <ion-card class="card">
+    <ion-card-content class="content-flex">
+      <div class="rows">
+        <ion-label><b>Hora de Atención:</b> </ion-label>
+        <ion-label><b>Box de Atención:</b></ion-label>
+      </div>
+      <div class="rows">
+        <ion-label><b>Hora de Atención:</b> </ion-label>
+        <ion-label><b>Box de Atención:</b> </ion-label>
+      </div>
+    </ion-card-content>
+  </ion-card>
+<ion-list lines="full">
+  <ion-item class="item-list">
+    <ion-label><b>10/10/2024</b></ion-label>
+    <ion-label style="text-align:center;">18:00hrs.</ion-label>
+    <ion-label>Dr. Pedro Perez Pereira</ion-label>
+    <ion-label slot="end">Activo</ion-label>
+  </ion-item>
+</ion-list>
+  
   
 </ion-content>

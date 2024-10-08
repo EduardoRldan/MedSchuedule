@@ -354,23 +354,27 @@ export class ServicebdService {
     })
   }
 
-  async getScheduledHrs(numrunPaciente : number, estado : number){
+  getScheduledHrs(numrunPaciente : number, estado : number){
+    // entrega todas las citas medicas del paciente dependiendo de su estado
+    // en este caso debería entregarlas solo si esta activo
+    // aunque puede entregarsele cualquier parámetro
     const query = "SELECT cita.id_cita AS id, cita.dia_cita AS dia, cita.mes_cita AS mes, cita.anno_cita AS anno, cita.hora_cita AS hora, cita.id_estado, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico as nombre_medico FROM cita_medica cita JOIN medico med ON cita.numrun_medico = med.numrun_medico WHERE numrun_paciente="+numrunPaciente+" AND id_estado="+ estado +";";
     let response = []
-    await this.database.executeSql(query,[])
+    return this.database.executeSql(query,[])
     .then((res) =>{
       if (res.rows.length>0){
         for (let i=0; i< res.rows.length; i++){
+          let horaStr = res.rows.item(i).hora as string;
           let scheduleHr = {
             idCita : res.rows.item(i).id,
             fecha : res.rows.item(i).dia + "/"+ res.rows.item(i).mes+"/"+res.rows.item(i).anno,
-            hora : res.rows.item(i).hora,
+            hora : horaStr.substring(0,5),
             estado : res.rows.item(i).id_estado,
             nombreMedico : res.rows.item(i).nombre_medico
           }
-          console.log('DFO: hora '+scheduleHr.hora)
+          //console.log('DFO: hora '+scheduleHr.hora)
           response.push(scheduleHr);
-          console.log('DFO: Hay citas')
+          ///console.log('DFO: Hay citas')
         }
         } else {
         console.log('DFO: No hay citas')
@@ -522,7 +526,6 @@ export class ServicebdService {
   
   insertNewAgenda(lista : Array<object>){
     console.log('DFO: guardando agenda');
-    let indicator = 0;
     let exists : boolean;
     for(let i = 0; i<lista.length; i++){
       let values = Object.values(lista[i]);
@@ -552,10 +555,12 @@ export class ServicebdService {
       }).catch(e => console.log('DFO: error consultando tabla '+JSON.stringify(e)))
     }
   }
+
   getCitasMedicasMedico(numrun : number){
     /// entrega todas las citas médicas del doctor si estan activas
     // OJO: no entrega los pacientes a los que pertenece
     // solo entrega si estan activas
+    // podria agregar un parametro con el estado, asi podria solicitar cualquiera
     let response = [];
     let obj : CitaMedica;
     return this.database.executeSql('SELECT * FROM cita_medica WHERE numrun_medico=? and id_estado=1 ;',[numrun])
@@ -569,6 +574,95 @@ export class ServicebdService {
         this.storage.setItem('citas'+numrun,response);
       }
     }).catch(e => console.log('DFO: error al encontrar citas médicas '+ JSON.stringify(e)))
+  }
+
+  getAllCitasMedicasFromPaciente(numrunPaciente : number){
+    // obtiene todas las citas medicas del paciente
+    // no importa si están activas o no
+    // esta funcion es para el paciente
+    let response = []
+    let obj = {
+      mes : 0,
+      dia : 0,
+      anno : 0,
+      hora : "",
+      nombreMedico : "",
+      numrunMedico : 0,
+      dvrun : "",
+      especialidad : "",
+      box : "",
+      estado : 0
+    }
+    return this.database.executeSql("SELECT cit.mes_cita AS mes_cita, cit.dia_cita AS dia_cita, cit.anno_cita AS anno_cita, cit.hora_cita AS hora_cita, cit.id_estado AS id_estado, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico AS nombre_medico, med.numrun_medico AS numrun, med.dvrun_medico AS dvrun, med.box_medico AS box, esp.nom_esp AS especialidad FROM cita_medica cit JOIN medico med ON cit.numrun_medico = med.numrun_medico JOIN especialidad esp ON med.id_esp = esp.id_esp WHERE numrun_paciente=? ;",[numrunPaciente])
+    .then((res) => {
+      if (res.rows.length>0){
+        for(let i = 0;i<res.rows.length;i++){
+          let horaStr = res.rows.item(i).hora_cita as string;
+          obj = {
+            mes : res.rows.item(i).mes_cita,
+            dia : res.rows.item(i).dia_cita,
+            anno : res.rows.item(i).anno_cita,
+            hora : horaStr.substring(0,5),
+            nombreMedico : res.rows.item(i).nombre_medico,
+            numrunMedico : res.rows.item(i).numrun,
+            dvrun : res.rows.item(i).dvrun,
+            box : res.rows.item(i).box,
+            especialidad : res.rows.item(i).especialidad,
+            estado : res.rows.item(i).id_estado
+          }
+          response.push(obj);
+        }
+        this.storage.setItem('citasPaciente'+numrunPaciente,response)
+      }
+    })
+  }
+
+  getCitasMedicasPaciente(numrunMedico : number){
+    // obtiene todos los pacientes del medico que tienen horas medicas
+    // da igual si están activas o no
+    // esta funcion es para el medico
+    // ordenar de la ultima a la primera
+    console.log('DFO: consultando citas del medico '+numrunMedico)
+    let response = [];
+    let obj ={
+      mes : 0,
+      dia : 0,
+      anno : 0,
+      hora : "",
+      estado : 0,
+      numrunPaciente : 0,
+    }
+    return this.database.executeSql('SELECT * FROM cita_medica WHERE numrun_medico =?',[numrunMedico])
+    .then((res) => {
+      if (res.rows.length>0){
+        for(let i = 0;i<res.rows.length;i++){
+          obj = {
+            mes : res.rows.item(i).mes_cita,
+            dia : res.rows.item(i).dia_cita,
+            anno : res.rows.item(i).anno_cita,
+            hora : res.rows.item(i).hora_cita,
+            estado : res.rows.item(i).id_estado,
+            numrunPaciente : res.rows.item(i).numrun_paciente, 
+          }
+          response.push(obj);
+        }
+        this.storage.setItem('citas'+numrunMedico,response)
+      }
+    }).catch(e => console.log('DFO: Error obteniendo citas '+JSON.stringify(e)))
+  }
+
+  getMedicInfo(nombreMedico : string){
+    /// obtiene los datos del médico pero no los genera como un objeto de Medico ya que no quiero el acceso al resto de los items
+    const splitName = nombreMedico.split(' ');
+    let obj = {
+      run : 0,
+      dv : "",
+      nombreMedico : "",
+      especialidad : "",
+      box : "",
+      tel : 0
+    }
+    return this.database.executeSql('SELECT med.numrun_medico AS numrun, med.dvrun_medico AS dvrun, med.box_medico AS box, med.tel_medico AS tel, esp.especialidad AS especialidad FROM medico med JOIN especiliadad esp ON med.id_esp = esp.id_esp WHERE ')
   }
 
   insertCitaMedica(obj : object){

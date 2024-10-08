@@ -66,6 +66,10 @@ const routes: Routes = [
     path: 'medic-post-login',
     loadChildren: () => import('./pages/medic-post-login/medic-post-login.module').then( m => m.MedicPostLoginPageModule)
   },
+  {
+    path: 'cita-details',
+    loadChildren: () => import('./pages/cita-details/cita-details.module').then( m => m.CitaDetailsPageModule)
+  },
 
 
 ];
