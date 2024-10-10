@@ -1,0 +1,11 @@
+.content-flex {
+    display:flex;
+    flex-direction:row;
+    justify-content:space-around;
+}
+
+.rows {
+    display:flex;
+    flex-direction: column;
+    margin-right: 1rem;
+}

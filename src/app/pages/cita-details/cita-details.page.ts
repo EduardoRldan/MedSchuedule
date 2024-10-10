@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { AlertController } from '@ionic/angular';
 import { EncoderService } from 'src/app/services/encoder.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 
@@ -19,13 +21,16 @@ export class CitaDetailsPage implements OnInit {
     dvrun : "",
     especialidad : "",
     box : "",
-    estado : 0
+    estado : 0,
+    id : 0
   }
   loadReady : boolean = false;
   constructor(
     private storage : NativeStorage,
     private bd : ServicebdService,
-    private ec : EncoderService
+    private ec : EncoderService,
+    private alertController : AlertController,
+    private router : Router
   ) { 
     this.loadData()
   }
@@ -59,14 +64,43 @@ export class CitaDetailsPage implements OnInit {
         nombreMedico : nomEncode,
         numrunMedico : sch[5],
         dvrun : sch[6],
-        especialidad : espEncode,
         box : sch[7],
-        estado : sch[9]
+        especialidad : espEncode,
+        estado : sch[9],
+        id : sch[10]
       };
       this.loadReady = true;
     }).catch(e =>{
       console.log('DFO: error encontrando cita '+JSON.stringify(e))
     })
+  }
+
+  async cancelCita(idCita : number){
+    await this.bd.updateCita(idCita,2)
+    .then(() =>{
+      this.router.navigate(['/tab-paciente'])
+    })
+  }
+
+  async confirmAlert(idCita : number){
+    const alert = await this.alertController.create(
+      {
+        header : "Cancelar hora",
+        subHeader : "¿Está seguro de cancelar su cita médica?",
+        message : '',
+        buttons : [{
+          text : "Cancelar",
+          role : 'cancel'
+        },
+        {
+          text : "Confirmar",
+          role : "confirm",
+          handler : ()=>{
+            this.cancelCita(idCita);
+          }
+        }]
+      });
+    await alert.present();
   }
 
 }

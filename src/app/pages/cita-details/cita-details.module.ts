@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { CitaDetailsPageRoutingModule } from './cita-details-routing.module';
 
 import { CitaDetailsPage } from './cita-details.page';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    CitaDetailsPageRoutingModule
+    CitaDetailsPageRoutingModule,
+    ComponentsModule
   ],
   declarations: [CitaDetailsPage]
 })

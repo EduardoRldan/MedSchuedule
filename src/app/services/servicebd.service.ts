@@ -107,7 +107,6 @@ export class ServicebdService {
       this.createDB();
   }
   createDB(){
-    
     this.platform.ready().then(()=>{
       this.sqlite.create({
         name: 'medschdb.db',
@@ -591,9 +590,10 @@ export class ServicebdService {
       dvrun : "",
       especialidad : "",
       box : "",
-      estado : 0
+      estado : 0,
+      id : 0
     }
-    return this.database.executeSql("SELECT cit.mes_cita AS mes_cita, cit.dia_cita AS dia_cita, cit.anno_cita AS anno_cita, cit.hora_cita AS hora_cita, cit.id_estado AS id_estado, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico AS nombre_medico, med.numrun_medico AS numrun, med.dvrun_medico AS dvrun, med.box_medico AS box, esp.nom_esp AS especialidad FROM cita_medica cit JOIN medico med ON cit.numrun_medico = med.numrun_medico JOIN especialidad esp ON med.id_esp = esp.id_esp WHERE numrun_paciente=? ;",[numrunPaciente])
+    return this.database.executeSql("SELECT cit.id_cita as id, cit.mes_cita AS mes_cita, cit.dia_cita AS dia_cita, cit.anno_cita AS anno_cita, cit.hora_cita AS hora_cita, cit.id_estado AS id_estado, med.pnombre_medico||' '||med.apaterno_medico||' '||med.amaterno_medico AS nombre_medico, med.numrun_medico AS numrun, med.dvrun_medico AS dvrun, med.box_medico AS box, esp.nom_esp AS especialidad FROM cita_medica cit JOIN medico med ON cit.numrun_medico = med.numrun_medico JOIN especialidad esp ON med.id_esp = esp.id_esp WHERE numrun_paciente=? ;",[numrunPaciente])
     .then((res) => {
       if (res.rows.length>0){
         for(let i = 0;i<res.rows.length;i++){
@@ -608,7 +608,8 @@ export class ServicebdService {
             dvrun : res.rows.item(i).dvrun,
             box : res.rows.item(i).box,
             especialidad : res.rows.item(i).especialidad,
-            estado : res.rows.item(i).id_estado
+            estado : res.rows.item(i).id_estado,
+            id : res.rows.item(i).id
           }
           response.push(obj);
         }
@@ -631,8 +632,12 @@ export class ServicebdService {
       hora : "",
       estado : 0,
       numrunPaciente : 0,
+      dvrunPaciente : "",
+      nombrePaciente : "",
+      telPaciente : 0,
+      id : 0
     }
-    return this.database.executeSql('SELECT * FROM cita_medica WHERE numrun_medico =?',[numrunMedico])
+    return this.database.executeSql("SELECT cit.id_cita as id, cit.mes_cita AS mes_cita, cit.dia_cita AS dia_cita, cit.anno_cita AS anno_cita, cit.hora_cita AS hora_cita, cit.id_estado AS id_estado, cit.numrun_paciente AS numrun_paciente, pac.dvrun_paciente AS dvrun_paciente, pac.pnombre_paciente||' '||pac.apaterno_paciente||' '||pac.amaterno_paciente AS nombre_paciente, pac.tel_paciente AS tel_paciente FROM cita_medica cit JOIN paciente pac ON cit.numrun_paciente = pac.numrun_paciente WHERE numrun_medico =? ORDER BY id_cita DESC;",[numrunMedico])
     .then((res) => {
       if (res.rows.length>0){
         for(let i = 0;i<res.rows.length;i++){
@@ -643,10 +648,14 @@ export class ServicebdService {
             hora : res.rows.item(i).hora_cita,
             estado : res.rows.item(i).id_estado,
             numrunPaciente : res.rows.item(i).numrun_paciente, 
+            dvrunPaciente : res.rows.item(i).dvrun_paciente,
+            nombrePaciente : res.rows.item(i).nombre_paciente,
+            telPaciente : res.rows.item(i).tel_paciente,
+            id : res.rows.item(i).id
           }
           response.push(obj);
         }
-        this.storage.setItem('citas'+numrunMedico,response)
+        this.storage.setItem('citasMedico'+numrunMedico,response)
       }
     }).catch(e => console.log('DFO: Error obteniendo citas '+JSON.stringify(e)))
   }
@@ -673,6 +682,22 @@ export class ServicebdService {
       .then(() =>{
         console.log('DFO: cita medica agendada')
       }).catch(e => console.log('DFO: Error agregando cita ',JSON.stringify(e)))
+  }
+
+  updateCita(id : number, estado : number){
+    return this.database.executeSql('UPDATE cita_medica SET id_estado=? WHERE id_cita=?',[estado, id])
+    .then(() =>{
+      switch(estado){
+        case 2:
+          this.toast.presentToast('Su cita ha sido cancelada')
+          break;
+        case 3:
+          this.toast.presentToast('Esta cita ha sido finalizada')
+          break;
+        default:
+          break;
+      }
+    }).catch(e => console.log('DFO: error actualizando tabla cita_medica '+JSON.stringify(e)))
   }
 
   insertLog(date : string, userId : number, logType : number){
