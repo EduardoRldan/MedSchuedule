@@ -18,7 +18,8 @@
       <ion-datetime
       [(ngModel)]="selectedDate" 
       presentation="date" 
-      min="{{ minDate }}" 
+      min="{{ minDate }}"
+      locale="es-ES"
       (ionChange)="showList(selectedDate)"></ion-datetime>
     </ion-card-content>
   </ion-card>

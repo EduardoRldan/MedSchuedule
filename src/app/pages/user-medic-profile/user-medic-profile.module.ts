@@ -4,18 +4,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { UserProfilePageRoutingModule } from './user-profile-routing.module';
+import { UserMedicProfilePageRoutingModule } from './user-medic-profile-routing.module';
 
-import { UserProfilePage } from './user-profile.page';
+import { UserMedicProfilePage } from './user-medic-profile.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    UserProfilePageRoutingModule,
+    UserMedicProfilePageRoutingModule,
     ReactiveFormsModule
   ],
-  declarations: [UserProfilePage]
+  declarations: [UserMedicProfilePage]
 })
-export class UserProfilePageModule {}
+export class UserMedicProfilePageModule {}

@@ -13,7 +13,7 @@ import { BehaviorSubject } from 'rxjs';
   templateUrl: './main-login.page.html',
   styleUrls: ['./main-login.page.scss'],
 })
-export class MainLoginPage implements OnInit, OnDestroy {
+export class MainLoginPage implements OnInit{
   devOn : boolean = true;
   mail : string = "";
   pw : string = "";
@@ -50,7 +50,6 @@ export class MainLoginPage implements OnInit, OnDestroy {
             this.idUserFetched.subscribe(i =>{
               this.redirectToPage(n,i);
             })
-            
           }
         })
       }
@@ -59,7 +58,13 @@ export class MainLoginPage implements OnInit, OnDestroy {
       this.toast.presentToast('Sesiones limpias')
     })
   }
-  ngOnDestroy() {
+
+  ionViewWillEnter(){
+    this.storage.clear();
+  }
+  ionViewDidLeave(){
+    this.loginForm.controls['email'].setValue("");
+    this.loginForm.controls['password'].setValue("");
   }
   /// cambiar usando los componentes
   signup () {
@@ -111,7 +116,7 @@ export class MainLoginPage implements OnInit, OnDestroy {
         this.isLoginValid = isReady;
         if(this.isLoginValid){
           await this.storage.getItem("userLogged").then((data)=> {
-            user = JSON.parse(data);
+            user = data;
             values = Object.values(user);
             let idRole = values[4] as number;
             let idUser = values[0] as number;
@@ -121,11 +126,14 @@ export class MainLoginPage implements OnInit, OnDestroy {
             this.toast.presentToast('Sesión iniciada correctamente');
           }).catch(e => {
             console.log('DFO: Error al obtener usuario' + JSON.stringify(e))
+            this.toast.presentToast('Usuario o contraseña incorrectos')
           })
         }else{
           this.toast.presentToast('Usuario o contraseña incorrectos')
         }
       })
+    }).catch(e =>{
+      console.log('DFO: getUser error '+JSON.stringify(e))
     })
   }
   

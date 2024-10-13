@@ -1,4 +1,5 @@
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from "@angular/forms";
+import { RutVerifyService } from "src/app/services/rut-verify.service";
 
 export class SignupForm {
     private formBuilder : FormBuilder;
@@ -11,23 +12,24 @@ export class SignupForm {
         return this.formBuilder.group({
             firstName : ['', [
                 Validators.required, 
-                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
+                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ]*')
             ]],
             secondName : ['', [
                 Validators.required, 
-                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
+                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ]*')
             ]],
             lastName : ['', [
                 Validators.required, 
-                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
+                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ]*')
             ]],
             secondLastName : ['', [
                 Validators.required, 
-                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ ]*')
+                Validators.pattern('[a-zA-ZÀ-ÖØ-öø-ÿ]*')
             ]],
             run : ['', [
                 Validators.required,
-                Validators.pattern('^[0-9]+-[0-9kK]{1}$')
+                Validators.pattern('^[0-9]+-[0-9kK]{1}$'),
+                this.rutValido
             ]],
             email : ['', [Validators.required, Validators.email]],
             phone : ['', [
@@ -109,6 +111,41 @@ export class SignupForm {
         return null
     }
 
-   
-
+    rutValido(control : FormControl){
+        const rut = control.value;
+        try{
+            const splitRut = rut.split('-');
+            const nums = splitRut[0];
+            const dv = splitRut[1];
+            if(rut!=""){
+                const invNum = nums.split("").reverse();
+                const factor = [2,3,4,5,6,7]
+                let x = 0
+                let sumatoria = 0;
+                for (let i = 0; i<invNum.length;i++){
+                    sumatoria+= parseInt(invNum[i]) * factor[x]
+                    x+=1
+                    if(x>5){x=0};
+                    }
+                const mult = (Math.trunc(sumatoria/11))*11;
+                const resta = sumatoria - mult;
+                const resultado = 11 - resta;
+                let dvAVerificar;
+                if (dv.toLowerCase() === 'k'){
+                    dvAVerificar = 10
+                } else if (dv === '0'){
+                    dvAVerificar = 11
+                } else {
+                    dvAVerificar = parseInt(dv);
+                }
+                if(dvAVerificar != resultado){
+                    return {rutValido : true}
+                }
+            }
+            return null;  
+        } catch {
+            return {rutValido : true};
+        }
+        
+    }
 }

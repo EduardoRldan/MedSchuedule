@@ -28,7 +28,7 @@ export class MainPagePage implements OnInit {
   }
 
   ionViewWillEnter(){
-    this.getSchedule(this.patientLogged.numrunPaciente);
+    this.getuser()
   }
 
   ionViewDidLeave(){

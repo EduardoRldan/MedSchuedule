@@ -12,7 +12,7 @@
     </ion-card-header>
     <ion-card-content *ngFor="let hr of todayAgenda">
       <ng-container *ngIf="todayAgenda.length != 0">
-        <ion-label>Something</ion-label>
+        <ion-label>Nro. de pacientes el día de hoy: {{todayAgenda.length}}</ion-label>
       </ng-container>
     </ion-card-content>
     <ion-card-content *ngIf="todayAgenda.length == 0">

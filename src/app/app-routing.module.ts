@@ -70,6 +70,10 @@ const routes: Routes = [
     path: 'cita-details',
     loadChildren: () => import('./pages/cita-details/cita-details.module').then( m => m.CitaDetailsPageModule)
   },
+  {
+    path: 'user-medic-profile',
+    loadChildren: () => import('./pages/user-medic-profile/user-medic-profile.module').then( m => m.UserMedicProfilePageModule)
+  },
 
 
 ];

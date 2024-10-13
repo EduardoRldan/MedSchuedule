@@ -13,6 +13,7 @@
       <ion-datetime
         [(ngModel)]="selectedDate"
         presentation="date"
+        locale="es-ES"
         [value]="defDate"
         (ionChange)="showPatientList(selectedDate)"></ion-datetime>
     </ion-card-content>

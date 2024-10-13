@@ -30,8 +30,8 @@ const routes: Routes = [
         loadChildren: () => import('../patient-config/patient-config.module').then( m => m.PatientConfigPageModule)
       },
       {
-        path: 'user-profile',
-        loadChildren: () => import('../user-profile/user-profile.module').then( m => m.UserProfilePageModule)
+        path: 'user-medic-profile',
+        loadChildren: () => import('../user-medic-profile/user-medic-profile.module').then( m => m.UserMedicProfilePageModule)
       }
     ]
   }

@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Perfil Usuario</ion-title>
+    <ion-title>Perfil Usuario Médico</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -12,7 +12,8 @@
       <div class="avatar-div">
         <div class="img-col">
           <img class="img-display" [src]="avatar" alt="avatar">
-          <ion-button (click)="takePicture()" class="btn img-btn"><ion-icon name="camera-outline"></ion-icon></ion-button>
+          <ion-button (click)="takePicture()" class="btn img-btn">
+            <ion-icon name="camera-outline"></ion-icon></ion-button>
         </div>
         <div>
           <ion-button [disabled]="!avatarChanged" (click)="submitAvatar(avatarObj)" class="btn">Subir Foto
@@ -52,6 +53,10 @@
         <ion-item class="input">
           <ion-input formControlName="phone" type="phone" label="Télefono" labelPlacement="floating"></ion-input>
         </ion-item>
+
+        <ion-item class="input">
+          <ion-input formControlName="box" type="text" label="Box de Atención" labelPlacement="floating"></ion-input>
+        </ion-item>
         <ion-button *ngIf="isEnabledForm" class="btn" type="submit" [disabled]="!updateForm.valid" (click)="updateUserData()">Guardar Datos
           <ion-icon slot="start" name="save-outline"></ion-icon>
         </ion-button>
@@ -68,9 +73,9 @@
       <form action="">
         <ion-item class="input">
           <ion-icon slot="start" name="mail-outline"></ion-icon>
-          <ion-input [(ngModel)]="emailInput" type="email" label="Inserte Nuevo E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>      
+          <ion-input type="email" label="Inserte Nuevo E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>      
         </ion-item>
-        <ion-button [disabled]="emailInput===''" class="btn" type="submit">Cambiar E-mail</ion-button>
+        <ion-button class="btn" type="submit">Cambiar E-mail</ion-button>
       </form>
     </ion-card-content>
   </ion-card>

@@ -25,7 +25,6 @@
 
         <ion-button class="btn" (click)="login(mail, pw)" [disabled]="!loginForm.valid">Iniciar Sesión</ion-button>
         <ion-button class="btn" (click)="signup()">Registrarse</ion-button>
-        <ion-button color="warning" *ngIf="devOn" (click)="getCount()">Cuenta usuarios</ion-button>
       </form>
     </ion-card-content>
   </ion-card>

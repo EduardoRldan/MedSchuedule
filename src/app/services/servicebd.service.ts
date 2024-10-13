@@ -7,6 +7,9 @@ import { AlerttoastService } from './alerttoast.service';
 import { ObjectHandlerService } from './object-handler.service';
 import { EncoderService } from './encoder.service';
 import { CitaMedica } from '../classes/cita-medica';
+import { Paciente } from '../classes/paciente';
+import { BlobConversionService } from './blob-conversion.service';
+import { Medic } from '../classes/medic';
 
 
 @Injectable({
@@ -103,7 +106,8 @@ export class ServicebdService {
     private platform : Platform, 
     private storage : NativeStorage,
     private toast : AlerttoastService,
-    private ec : EncoderService) {
+    private ec : EncoderService,
+    private bc : BlobConversionService) {
       this.createDB();
   }
   createDB(){
@@ -190,10 +194,10 @@ export class ServicebdService {
     let query = "SELECT * FROM user WHERE email='"+ email + "' AND  pw='"+ pw + "';";
     return this.database.executeSql(query,[])
     .then((res) => {
-      console.log('Query passed. Length: '+res.rows.length);
+      ///console.log('Query passed. Length: '+res.rows.length);
       if (res.rows.length>0){
-        console.log('DFO: Usuario encontrado')
-        console.log("idUser: " +res.rows.item(0).id_user);
+        //console.log('DFO: Usuario encontrado')
+        //console.log("idUser: " +res.rows.item(0).id_user);
         response = {
           idUser : res.rows.item(0).id_user,
           email : res.rows.item(0).email,
@@ -201,8 +205,9 @@ export class ServicebdService {
           fotoPerfil : res.rows.item(0).foto_perfil,
           idRole : res.rows.item(0).id_role
         }
+        
         //isValid = true;
-        this.storage.setItem("userLogged", JSON.stringify(response));
+        this.storage.setItem("userLogged", response);
         this.isLoginValid.next(true);
       }
     }).catch((e) => {
@@ -222,12 +227,12 @@ export class ServicebdService {
         response = {
           numrunMedico : res.rows.item(0).numrun_medico,
           dvRunMedico : res.rows.item(0).dvrun_medico,
-          pnombreMedico : res.rows.item(0).pnombre_medico,
-          snombreMedico : res.rows.item(0).snombre_medico,
-          apaternoMedico : res.rows.item(0).apaterno_medico,
-          amaternoMedico : res.rows.item(0).amaterno_medico,
+          pnombreMedico : this.ec.convertStringUTF8(res.rows.item(0).pnombre_medico),
+          snombreMedico : this.ec.convertStringUTF8(res.rows.item(0).snombre_medico),
+          apaternoMedico : this.ec.convertStringUTF8(res.rows.item(0).apaterno_medico),
+          amaternoMedico : this.ec.convertStringUTF8(res.rows.item(0).amaterno_medico),
           telMedico : res.rows.item(0).tel_medico,
-          boxMedico : res.rows.item(0).box_medico,
+          boxMedico : this.ec.convertStringUTF8(res.rows.item(0).box_medico),
           tiempoBloque : res.rows.item(0).tiempo_bloque,
           idEsp : res.rows.item(0).id_esp,
           idUser : idUser
@@ -249,7 +254,7 @@ export class ServicebdService {
       email : values[5],
       pw : values[7],
       active : 1,
-      fotoPerfil : {},
+      fotoPerfil : "",
       idRole : 1
     }
     const rut = values[4] as string;
@@ -258,14 +263,13 @@ export class ServicebdService {
     let patObj = {
       numrun : parseInt(splitRun[0]),
       dvrun : splitRun[1],
-      pnombre : values[0],
-      snombre : values[1],
-      apaterno : values[2],
-      amaterno : values[3],
+      pnombre : this.ec.convertStringISO(values[0]),
+      snombre : this.ec.convertStringISO(values[1]),
+      apaterno : this.ec.convertStringISO(values[2]),
+      amaterno : this.ec.convertStringISO(values[3]),
       tel : values[6],
     }
-    // const query1 = 'INSERT INTO user(email, pw, active, foto_perfil, id_role) VALUES(' +
-    // "'${userObj.email}','${userObj.pw}',${userObj.active},${userObj.fotoPerfil}, ${userObj.idRole});";
+
     const query1 = 'INSERT INTO user(email, pw, active, foto_perfil, id_role) VALUES(?,?,?,?,?);'
     await this.database.executeSql(query1,[userObj.email,userObj.pw,userObj.active,userObj.fotoPerfil,userObj.idRole])
     .then(async () =>{
@@ -339,10 +343,10 @@ export class ServicebdService {
         response = {
           numrun : res.rows.item(0).numrun_paciente,
           dvrun : res.rows.item(0).dvrun_paciente,
-          pnombre : res.rows.item(0).pnombre_paciente,
-          snombre : res.rows.item(0).snombre_paciente,
-          apaterno : res.rows.item(0).apaterno_paciente,
-          amaterno : res.rows.item(0).amaterno_paciente,
+          pnombre : this.ec.convertStringUTF8(res.rows.item(0).pnombre_paciente),
+          snombre : this.ec.convertStringUTF8(res.rows.item(0).snombre_paciente),
+          apaterno : this.ec.convertStringUTF8(res.rows.item(0).apaterno_paciente),
+          amaterno : this.ec.convertStringUTF8(res.rows.item(0).amaterno_paciente),
           tel : res.rows.item(0).tel_paciente,
           id : idUser
         }
@@ -700,8 +704,73 @@ export class ServicebdService {
     }).catch(e => console.log('DFO: error actualizando tabla cita_medica '+JSON.stringify(e)))
   }
 
+  updatePacienteData(paciente : Paciente){
+    return this.database.executeSql('UPDATE paciente SET pnombre_paciente=?, snombre_paciente=?, apaterno_paciente=?, amaterno_paciente=?, tel_paciente=? WHERE numrun_paciente=?',
+      [paciente.pnombrePaciente,
+        paciente.snombrePaciente,
+        paciente.apaternoPaciente,
+        paciente.apaternoPaciente,
+        paciente.telPaciente, 
+        paciente.telPaciente])
+      .then(() =>{
+
+        this.toast.presentToast('Datos actualizados exitosamente')
+      }).catch(e => console.log('DFO: error actualizando datos '+ JSON.stringify(e)))
+  }
+
+  updateMedicData(medico : Medic){
+    return this.database.executeSql('UPDATE medico SET pnombre_medico=?, snombre_medico=?, apaterno_medico=?, amaterno_medico=?, tel_medico=?, box_medico=? WHERE numrun_medico=? ;',
+      [medico.pnombreMedico,medico.snombreMedico,medico.apaternoMedico,medico.amaternoMedico,medico.telMedico,medico.boxMedico,medico.numrunMedico])
+      .then(() => {
+        this.toast.presentToast('Datos actualizados exitosamente');
+      }).catch(e => console.log('DFO: Error actualizando médico '+JSON.stringify(e)))
+  }
+
+  async updateAvatar(idUser : number, avatar : string){
+    //const arrbuffer = await this.bc.convert(avatar)
+    //const byteArrayAvatar = new Uint8Array(arrbuffer)
+    ///console.log('DFO: byteArray '+byteArrayAvatar)
+    return this.database.executeSql('UPDATE user SET foto_perfil=? WHERE id_user=? ;',[avatar, idUser])
+    .then(() =>{
+      this.toast.presentToast('Foto de perfil agregada exitosamente')
+    }).catch(e => console.log('DFO: error al agregar foto ',JSON.stringify(e)))
+  }
+
+  updateUserEmail(email : string, id : number){
+    return this.database.executeSql('UPDATE user SET email=? WHERE id_user=? ;',[email, id])
+    .then(() =>{
+      this.toast.presentToast('Su email ha sido cambiado')
+    }).catch(e => console.log('DFO: error actualizando email '+JSON.stringify(e)))
+  }
+
+  checkForPassword( id : number){
+    let response = "";
+    return this.database.executeSql('SELECT pw FROM user WHERE id_user=? ;',[id])
+    .then((res) => {
+      if(res.rows.length>0){
+        response = res.rows.item(0).pw
+        this.storage.setItem('pw'+id,response);
+      }
+    })
+  }
+
+
+
+  updatePw(newPw : string, id : number){
+    return this.database.executeSql('UPDATE user SET pw=? WHERE id_user=? ;',[newPw,id])
+    .then(() =>{
+      this.toast.presentToast('La contraseña fue cambiada correctamente')
+    }).catch(e => console.log('DFO: Error cambiando contraseña '+JSON.stringify(e)))
+  }
+
   insertLog(date : string, userId : number, logType : number){
     const query = 'INSERT INTO log'
+  }
+
+  logOut(){
+    // sirve solo para devolver el observable a falso
+    // de esa manera al cerrar sesión no podrá intentar buscar el usuario en el storage
+    this.isLoginValid.next(false)
   }
 
   /// SOLO POR PROPOSITOS DE TESTING, NO USAR

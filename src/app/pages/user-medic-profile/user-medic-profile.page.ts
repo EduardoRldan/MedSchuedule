@@ -2,67 +2,67 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { Paciente } from 'src/app/classes/paciente';
+import { Medic } from 'src/app/classes/medic';
 import { User } from 'src/app/classes/user';
 import { ObjectHandlerService } from 'src/app/services/object-handler.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
-import { UpdateForm } from './user-profile.form';
+import { UpdateMedicForm } from './user-medic-profile.form';
 import { Camera, CameraResultType } from '@capacitor/camera';
-import { Directory, Filesystem } from '@capacitor/filesystem';
-import { BlobConversionService } from 'src/app/services/blob-conversion.service';
-import { EncoderService } from 'src/app/services/encoder.service';
-import { PasswordForm } from './user-profile-pw-form';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
+import { PasswordMedicForm } from './user-medic-profile-pw.form';
 
 @Component({
-  selector: 'app-user-profile',
-  templateUrl: './user-profile.page.html',
-  styleUrls: ['./user-profile.page.scss'],
+  selector: 'app-user-medic-profile',
+  templateUrl: './user-medic-profile.page.html',
+  styleUrls: ['./user-medic-profile.page.scss'],
 })
-export class UserProfilePage implements OnInit {
+export class UserMedicProfilePage implements OnInit {
   userLogged! : User;
-  patientLogged! : Paciente;
+  medicLogged! : Medic;
 
-  // datos del formulario
+  // datos formulario
   updateForm! : FormGroup;
+  isEnabledForm : boolean = false;
   pnombre : string = "";
   snombre : string = "";
   apaterno : string = "";
   amaterno : string = "";
+  box : string = "";
   tel : number = 0;
-  // habilitador
-  isEnabledForm :boolean = false;
-  // cambiar contraseña
+
+  // avatar
+  avatar : any = 'assets/img/avatardef.png';
+  avatarObj : any;
+  avatarChanged : boolean = false;
+
+  // email
+  emailInput : string = "";
+
+  // password
   passwordForm! : FormGroup;
-  oldPw : string = "";
-  newPw : string = "";
-  confirmNewPw : string = "";
   validOldPw : boolean = true;
   validNewPw : boolean = true;
   confirmationValid : boolean = true;
-  // foto
-  avatar : any = 'assets/img/avatardef.png';
-  avatarPath! : string;
-  avatarObj : any;
-  avatarChanged : boolean = false;
-  // email
-  emailInput :string = "";
-  constructor(
-    private router : Router,
+
+  constructor(private router : Router,
     private bd : ServicebdService,
     private storage : NativeStorage,
     private handler : ObjectHandlerService,
     private formBuilder : FormBuilder,
-    private toast : AlerttoastService
-  ) { }
+    private toast : AlerttoastService) { }
 
   ngOnInit() {
-    this.updateForm = new UpdateForm(this.formBuilder).createForm()
-    this.passwordForm = new PasswordForm(this.formBuilder).createForm()
+    this.updateForm = new UpdateMedicForm(this.formBuilder).createForm()
+    this.passwordForm = new PasswordMedicForm(this.formBuilder).createForm()
     this.loadData()
     if(!this.isEnabledForm){
       this.disableForm();
     }
+  }
+
+  ionViewDidLeave(){
+    this.isEnabledForm = false;
+    this.avatarChanged = false;
   }
 
   ionViewWillEnter(){
@@ -72,36 +72,14 @@ export class UserProfilePage implements OnInit {
     }
   }
 
-  ionViewDidLeave(){
-    this.isEnabledForm = false;
-    this.avatarChanged = false;
-    
-  }
-
-  enableForm(){
-    this.isEnabledForm = true;
-    this.updateForm.controls['firstName'].enable();
-    this.updateForm.controls['secondName'].enable();
-    this.updateForm.controls['lastName'].enable();
-    this.updateForm.controls['secondLastName'].enable();
-    this.updateForm.controls['phone'].enable();
-  }
-
-  disableForm(){
-    this.updateForm.controls['firstName'].disable();
-    this.updateForm.controls['secondName'].disable();
-    this.updateForm.controls['lastName'].disable();
-    this.updateForm.controls['secondLastName'].disable();
-    this.updateForm.controls['phone'].disable();
-  }
-
   async loadData(){
     await this.storage.getItem('userLogged')
     .then((data) =>{
       this.userLogged = this.handler.createUserObject(data);
-      this.storage.getItem('patientLogged')
-      .then((data) => {
-        this.patientLogged = this.handler.createPatientObject(JSON.parse(data));
+      this.storage.getItem('medicLogged')
+      .then((data)=>{
+        console.log('DFO: Medico encontrado')
+        this.medicLogged = this.handler.createMedicObject(JSON.parse(data))
         this.fillForm();
         if (this.userLogged.fotoPerfil != ""){
           console.log('DFO foto_perfil '+this.userLogged.fotoPerfil)
@@ -114,17 +92,38 @@ export class UserProfilePage implements OnInit {
   }
 
   fillForm(){
-    this.pnombre = this.patientLogged.pnombrePaciente;
-    this.snombre = this.patientLogged.snombrePaciente;
-    this.apaterno = this.patientLogged.apaternoPaciente;
-    this.amaterno = this.patientLogged.amaternoPaciente;
-    this.tel = this.patientLogged.telPaciente;
+  this.pnombre= this.medicLogged.pnombreMedico
+  this.snombre = this.medicLogged.snombreMedico
+  this.apaterno = this.medicLogged.apaternoMedico
+  this.amaterno = this.medicLogged.amaternoMedico
+  this.box = this.medicLogged.boxMedico
+  this.tel = this.medicLogged.telMedico
 
-    this.updateForm.controls['firstName'].setValue(this.pnombre);
-    this.updateForm.controls['secondName'].setValue(this.snombre);
-    this.updateForm.controls['lastName'].setValue(this.apaterno);
-    this.updateForm.controls['secondLastName'].setValue(this.amaterno);
-    this.updateForm.controls['phone'].setValue(this.tel);
+  this.updateForm.controls['firstName'].setValue(this.pnombre);
+  this.updateForm.controls['secondName'].setValue(this.snombre);
+  this.updateForm.controls['lastName'].setValue(this.apaterno);
+  this.updateForm.controls['secondLastName'].setValue(this.amaterno);
+  this.updateForm.controls['phone'].setValue(this.tel);
+  this.updateForm.controls['box'].setValue(this.box);
+  }
+
+  enableForm(){
+    this.isEnabledForm = true;
+    this.updateForm.controls['firstName'].enable();
+    this.updateForm.controls['secondName'].enable();
+    this.updateForm.controls['lastName'].enable();
+    this.updateForm.controls['secondLastName'].enable();
+    this.updateForm.controls['phone'].enable();
+    this.updateForm.controls['box'].enable();
+  }
+
+  disableForm(){
+    this.updateForm.controls['firstName'].disable();
+    this.updateForm.controls['secondName'].disable();
+    this.updateForm.controls['lastName'].disable();
+    this.updateForm.controls['secondLastName'].disable();
+    this.updateForm.controls['phone'].disable();
+    this.updateForm.controls['box'].disable();
   }
 
   async updateUserData(){
@@ -135,32 +134,40 @@ export class UserProfilePage implements OnInit {
         snombre : values[1] as string,
         apaterno : values[2] as string,
         amaterno : values[3] as string,
-        tel : values[4] as number
+        tel : values[4] as number,
+        box : values[5] as string
       }
-      let newPaciente : Paciente = new Paciente(
-        this.patientLogged.numrunPaciente,
-        this.patientLogged.dvRunPaciente,
+      let newMedico : Medic = new Medic(
+        this.medicLogged.numrunMedico,
+        this.medicLogged.dvRunMedico,
         updateValues.pnombre,
         updateValues.snombre,
         updateValues.apaterno,
         updateValues.amaterno,
         updateValues.tel,
-        this.patientLogged.idUser)
-      await this.bd.updatePacienteData(newPaciente)
+        updateValues.box,
+        this.medicLogged.tiempoBloque,
+        this.medicLogged.idEsp,
+        this.medicLogged.idUser
+      )
+      await this.bd.updateMedicData(newMedico)
       .then(async () =>{
         let dataNew = {
-          numrun : newPaciente.numrunPaciente,
-          dvrun : newPaciente.dvRunPaciente,
-          pnombre : newPaciente.pnombrePaciente,
-          snombre : newPaciente.snombrePaciente,
-          apaterno : newPaciente.apaternoPaciente,
-          amaterno : newPaciente.amaternoPaciente,
-          tel : newPaciente.telPaciente,
-          id : this.patientLogged.idUser
+          numrunMedico : newMedico.numrunMedico,
+          dvRunMedico : newMedico.dvRunMedico,
+          pnombreMedico : newMedico.pnombreMedico,
+          snombreMedico : newMedico.snombreMedico,
+          apaternoMedico : newMedico.apaternoMedico,
+          amaternoMedico : newMedico.amaternoMedico,
+          telMedico : newMedico.telMedico,
+          boxMedico : newMedico.boxMedico,
+          tiempoBloque : newMedico.tiempoBloque,
+          idEsp : newMedico.idEsp,
+          idUser : this.medicLogged.idUser
         }
-        await this.storage.setItem('patientLogged',JSON.stringify(dataNew))
+        await this.storage.setItem('medicLogged',JSON.stringify(dataNew))
         .then(() =>{
-          this.router.navigate(['/tab-paciente'])
+          this.router.navigate(['/tab-medico'])
         })
       })
     }
@@ -179,21 +186,42 @@ export class UserProfilePage implements OnInit {
     // You can access the original file using image.path, which can be
     // passed to the Filesystem API to read the raw data of the image,
     // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-    this.avatarPath = image.path as string // DEPRECADO
     this.avatarObj = JSON.stringify(image);
     //console.log('DFO: objeto ruta '+ typeof(image.path))
     this.avatar = image.webPath;
   };
-  
-  // async setAvatarImg(blobImg : string){
-  //   /// DEPRECADO 
-  //   console.log('DFO: convirtiendo a objeto')
-  //   const blob = this.bc.decode(blobImg)
 
-  //   console.log('DFO: typeofblob: '+typeof(blob))
-  //   const imageUrl = blob
-  //   return imageUrl
-  // }
+  async submitAvatar(avatar : string){
+    await this.bd.updateAvatar(this.userLogged.idUser, avatar)
+    .then(async () => {
+      let newUserData = {
+        idUser : this.userLogged.idUser,
+        email : this.userLogged.email,
+        active : this.userLogged.active,
+        fotoPerfil : this.avatarObj,
+        idRole : this.userLogged.idRole
+      }
+      await this.storage.setItem('userLogged', newUserData)
+      .then(() => {
+        this.router.navigate(['/tab-medico']);
+      })
+    })
+  }
+
+  checkEmail(){
+    return this.emailInput === this.userLogged.email
+  }
+
+  async changeEmail(){
+    if(this.checkEmail()){
+      await this.bd.updateUserEmail(this.emailInput,this.userLogged.idUser)
+      .then(() => {
+        this.logOutSession()
+      })
+    } else {
+      this.toast.presentToast('El nuevo email no puede ser el actual')
+    }
+  }
 
   async checkForPw(oldPw : string) : Promise<boolean>{
     // chequea en primer lugar si la contraseña actual es la correcta
@@ -249,39 +277,6 @@ export class UserProfilePage implements OnInit {
       this.confirmationValid = false
     }
     
-  }
-
-  async submitAvatar(avatar : string){
-    console.log('DFO: objeto '+avatar)
-    await this.bd.updateAvatar(this.userLogged.idUser, avatar)
-    .then(async () => {
-      let newUserData = {
-        idUser : this.userLogged.idUser,
-        email : this.userLogged.email,
-        active : this.userLogged.active,
-        fotoPerfil : this.avatarObj,
-        idRole : this.userLogged.idRole
-      }
-      await this.storage.setItem('userLogged', newUserData)
-      .then(() => {
-        this.router.navigate(['/tab-paciente']);
-      })
-    })
-  }
-
-  checkEmail(){
-    return this.emailInput === this.userLogged.email
-  }
-
-  async changeEmail(){
-    if(this.checkEmail()){
-      await this.bd.updateUserEmail(this.emailInput,this.userLogged.idUser)
-      .then(() => {
-        this.logOutSession();
-      })
-    } else {
-      this.toast.presentToast('El nuevo email no puede ser el actual')
-    }
   }
 
   logOutSession(){
