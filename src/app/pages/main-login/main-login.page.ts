@@ -7,6 +7,7 @@ import { User } from 'src/app/classes/user';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
 import { BehaviorSubject } from 'rxjs';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-main-login',
@@ -33,6 +34,7 @@ export class MainLoginPage implements OnInit{
     private bd : ServicebdService, 
     private storage : NativeStorage, 
     private toast : AlerttoastService) {
+      LocalNotifications.requestPermissions(); // debería activarse una vez para permitir las notificaciones si es que no estan activas
     }
 
   ngOnInit() {
@@ -139,4 +141,7 @@ export class MainLoginPage implements OnInit{
   
       
   // testing
+  testing(){
+    this.router.navigate(['/medic-post-login'])
+  }
 }

@@ -763,8 +763,22 @@ export class ServicebdService {
     }).catch(e => console.log('DFO: Error cambiando contraseña '+JSON.stringify(e)))
   }
 
+  updatePwWithMail(newPw : string, email : string){
+    // es lo mismo que el otro pero utiliza el email en lugar del id
+
+    return this.database.executeSql('UPDATE user SET pw=? WHERE email=? ;',[newPw,email])
+    .then(() =>{
+      this.toast.presentToast('La contraseña fue cambiada correctamente')
+    }).catch(e => console.log('DFO: error cambiando la contraseña '+JSON.stringify(e)))
+  }
+
   insertLog(date : string, userId : number, logType : number){
     const query = 'INSERT INTO log'
+  }
+
+  async checkEmailExists(email : string) : Promise<boolean>{
+    const result = await this.database.executeSql('SELECT COUNT(*) AS count FROM user WHERE email=? ;',[email])
+    return result.rows.item(0).count > 0
   }
 
   logOut(){

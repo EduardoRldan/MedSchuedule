@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 import { RutVerifyService } from 'src/app/services/rut-verify.service';
 
 @Component({
@@ -16,6 +17,28 @@ export class MedicPostLoginPage implements OnInit {
   verificar(rut : string){
     const rutSplit = rut.split('-');
     console.log(this.ver.verify(parseInt(rutSplit[0]),rutSplit[1]))
+  }
+  
+
+  async scheduleNotification(){
+    await LocalNotifications.requestPermissions()
+    let options : ScheduleOptions ={
+      notifications : [
+        {
+          id:1,
+          title : "Ejemplo",
+          body : "Este una notificacion de ejemplo",
+          largeBody : "Esta es una notificación de ejemplo donde habrá textos y cosas así",
+          summaryText : "Es un ejemplo"
+        }
+      ]
+    }
+    try{
+      await LocalNotifications.schedule(options)
+    } catch(e) {
+
+    }
+    
   }
 
 }
