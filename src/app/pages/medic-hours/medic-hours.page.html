@@ -25,15 +25,29 @@
       <ion-card-content>
         <ion-datetime [(ngModel)]="daySelected" (ionChange)="triggerDate($event)" locale="es-ES" presentation="date" [min]="defDate" [monthValues]="annoTrimestre.meses" [yearValues]="annoTrimestre.anno"></ion-datetime>
       </ion-card-content>
-      <ng-container *ngIf="showBtnOptions(daySelected)==false && daySelected != ''">
+      <ng-container *ngIf="showBtnOptions(daySelected)==false && daySelected != '' && !isHoliday">
         <ion-card-content>
-          <ion-label>No tiene agendas este día</ion-label>
+          <h4>No tiene agendas este día</h4>
           <ion-button class="btn" (click)="loadOptions()">Crear Agenda</ion-button>
         </ion-card-content>
       </ng-container>
-      <ng-container *ngIf="showBtnOptions(daySelected)==true">
+      <ng-container *ngIf="isHoliday">
+        <ion-card-content style="display:block;">
+          <h5 class="card-title">Día feriado</h5>
+          <h6>{{ nombreFeriado }}</h6>
+          <h6 *ngIf="inalienable">Irrenunciable</h6>
+          <h6 *ngIf="!inalienable">No Irrenunciable</h6>
+          <ng-container *ngIf="!inalienable">
+            <h6 *ngIf="showBtnOptions(daySelected)==false">No tiene agendas este día</h6>
+            <h6 *ngIf="showBtnOptions(daySelected)==true">Tiene agendas este día</h6>
+            <ion-button *ngIf="showBtnOptions(daySelected)==false" class="btn" (click)="loadOptions()">Crear Agenda</ion-button>
+            <ion-button *ngIf="showBtnOptions(daySelected)==true" class="btn" (click)="loadOptions()">Modificar Agenda</ion-button>
+          </ng-container>
+        </ion-card-content>
+      </ng-container>
+      <ng-container *ngIf="showBtnOptions(daySelected)==true && !isHoliday">
         <ion-card-content>
-          <ion-label>Tiene agendas este día</ion-label>
+          <h4>Tiene agendas este día</h4>
           <ion-button class="btn" (click)="loadOptions()">Modificar Agenda</ion-button>
         </ion-card-content>
       </ng-container>

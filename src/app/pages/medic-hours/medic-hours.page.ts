@@ -5,6 +5,7 @@ import { AlertController, NavController, ToastController } from '@ionic/angular'
 import { Medic } from 'src/app/classes/medic';
 import { AlertService } from 'src/app/services/alert.service';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
+import { ApiServiceService } from 'src/app/services/api-service.service';
 import { ObjectHandlerService } from 'src/app/services/object-handler.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 import { TodayDateService } from 'src/app/services/today-date.service';
@@ -51,11 +52,18 @@ export class MedicHoursPage implements OnInit {
   previousSelect : string = "";
   // validadores de fecha
   defDate : string = ""
-  monthConstraing : Array<number> = []
   startHour! : string;
   endHour! : string;
   breakStart! : string;
   breakEnd! : string;
+
+  // lista feriados
+  // obtendrá una lista de objetos que contiene feriados
+  feriadosList : any = []
+  isHoliday : boolean = false;
+  nombreFeriado : string = "";
+  tipoFeriado : string = "";
+  inalienable : boolean = false;
 
   indicator : number = 0;
   constructor(
@@ -66,7 +74,7 @@ export class MedicHoursPage implements OnInit {
     private handler : ObjectHandlerService,
     private alert : AlertService,
     private toast : AlerttoastService,
-    private navCtrl : NavController) {
+    private api : ApiServiceService) {
     }
 
   ngOnInit() {
@@ -81,6 +89,7 @@ export class MedicHoursPage implements OnInit {
   ionViewDidLeave(){
     this.showCalendar = false;
     this.showOptions = false;
+    this.isHoliday = false;
   }
 
   loadData(){
@@ -93,29 +102,18 @@ export class MedicHoursPage implements OnInit {
       .then(() =>{
         this.storage.getItem('annoTrimestre')
         .then((data)=> {
-          //console.log('DFO: Datos obtenidos annoTrimestre')
-          let obj = data;
-          this.annoTrimestre = obj;
+          this.annoTrimestre = data;
+          this.getFeriados(this.annoTrimestre.anno);
           this.bd.getAgenda(this.medicLogged.numrunMedico,this.annoTrimestre.idAnno)
           .then(() =>{
-            //console.log('DFO: agenda encontrada');
             this.storage.getItem('agendaLista')
             .then((data) => {
               let list: Array<object> = Object.values(data)
-              //console.log('DFO: Obteniendo agenda');
-              for (let el of list){
-                let val = Object.values(el);
-                //console.log('DFO agendas mes'+val[0]+' dia '+val[1]+' horaI '+val[2]+' horaT '+val[3])
-              }
-              //console.log('DFO: desde medic-hours '+list)
-              //console.log('DFO: '+Object.values(list[0]))
               this.agendaList = list;
             }).catch(e => {
-              //console.log('DFO: Error al cargar agenda '+JSON.stringify(e))
               this.agendaList = [];
             })
           }).catch(e => {
-            //console.log('DFO: Error obteniendo agenda' + JSON.stringify(e))
             this.agendaList = [];
           })
         }).catch(e => console.log('DFO: Error obteniendo añoTrimestre'))
@@ -145,9 +143,20 @@ export class MedicHoursPage implements OnInit {
     this.showBtnOptions(this.daySelected)
   }
 
+  getFeriados(anno : number){
+    this.api.getFeriadosAnno(anno).subscribe((res) => {
+      let val = Object.values(res);
+      this.feriadosList = val[1];
+    }, (error) =>{
+      console.log('DFO: error obteniendo feriados '+JSON.stringify(error))
+    })
+  }
+
+
   showBtnOptions(day : string){
     // debe devolver un verdadero o falso si el día ya tiene su agenda o no respectivamente
     //console.log('DFO: daySelected '+this.daySelected)
+    this.isHoliday = false;
     if (this.valueChanged(this.previousSelect, day)){
       this.previousSelect = day;
       this.showOptions = false;
@@ -159,6 +168,10 @@ export class MedicHoursPage implements OnInit {
     // aquí debe consultarse a la lista si algun elemento corresponde al día seleccionado
     //testeo
     let exists : boolean = false;
+    if(this.dayIsHoliday(day)){
+      this.isHoliday = true;
+      //return false
+    }
     if(this.agendaList.length>0){
       this.agendaList.forEach( agenda => {
         let list = Object.values(agenda);
@@ -211,6 +224,26 @@ export class MedicHoursPage implements OnInit {
     this.agendaList.push(agObj1)
     this.agendaList.push(agObj2)
     this.toast.presentToast('Agenda guardada. Al finalizar recuerde presionar "Subir Agenda" para activarlas.')
+  }
+
+  dayIsHoliday(date : string) : boolean{
+    let isValid : boolean = false;
+    const splitDate = this.today.splitDate(date);
+    let mmonth = parseInt(splitDate[1]);
+    let dd = parseInt(splitDate[2]);
+    console.log('DFO: dayIsHoliday length '+this.feriadosList.length)
+    for(let i = 0; i<this.feriadosList.length;i++){
+      let values = Object.values(this.feriadosList[i]);
+      const fecha = values[0] as string;
+      const split = fecha.split('-');
+      console.log('DFO: dia '+split[2]+' mes '+split[1]);
+      if (mmonth === parseInt(split[1]) && dd === parseInt(split[2])){
+        isValid = true;
+        this.inalienable = values[3] as boolean;
+        this.nombreFeriado = values[1] as string;
+      }
+    }
+    return isValid
   }
 
   isHigherThanStart(){
