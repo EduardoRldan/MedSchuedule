@@ -1,0 +1,92 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Administración BD</ion-title>
+    <ion-buttons slot="start">
+      <app-btn-back page="/main-admin-page"></app-btn-back>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Tabla Especialidad</ion-card-title>
+      <ion-list lines="full">
+        <ng-container *ngFor="let esp of especialidadesList">
+          <ion-item class="item-list">
+            <ion-label>{{esp.idEsp}}</ion-label>
+            <ion-label>{{esp.name}}</ion-label>
+            <ion-button (click)="confirmDelete(esp.idEsp,1)" fill="clear" slot="end" color="danger">
+              <ion-icon size="large" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item class="input">
+        <ion-input [(ngModel)]="espInput" type="text" label="Nueva Especialidad" labelPlacement="floating"></ion-input>
+      </ion-item>
+      <ion-button [disabled]="espInput===''" class="btn" (click)="addValues(espInput,1)">Agregar Nueva Especialidad</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Tabla Log Type</ion-card-title>
+      <ion-list lines="full">
+        <ng-container *ngFor="let type of logTypeList">
+          <ion-item class="item-list">
+            <ion-label>{{type.idType}}</ion-label>
+            <ion-label>{{type.descLog}}</ion-label>
+            <ion-button (click)="confirmDelete(type.idType,2)" fill="clear" slot="end" color="danger">
+              <ion-icon size="large" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item class="input">
+        <ion-input [(ngModel)]="typeInput" type="text" label="Nuevo Log Type" labelPlacement="floating"></ion-input>
+      </ion-item>
+      <ion-button [disabled]="typeInput===''" class="btn" (click)="addValues(typeInput,2)">Agregar Nuevo Log Type</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Tabla Año-Trimestre</ion-card-title>
+      <ion-list lines="full">
+        <ng-container *ngFor="let anno of annoTrimestreList">
+          <ion-item class="item-list">
+            <ion-label>{{anno.idAnno}}</ion-label>
+            <ion-label>{{anno.anno}}</ion-label>
+            <ion-label>{{anno.idTrimestre}}</ion-label>
+            <ion-button *ngIf="anno.active==1" (click)="confirmUpdate(0,anno.idAnno)" fill="clear" slot="end" color="danger">
+              <ion-icon size="large" name="close-outline"></ion-icon>
+            </ion-button>
+            <ion-button *ngIf="anno.active==0" (click)="confirmUpdate(1,anno.idAnno)" fill="clear" slot="end" color="success">
+              <ion-icon size="large" name="checkmark-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item class="input">
+        <ion-input [(ngModel)]="annoInput" type="number" label="Nuevo Año" labelPlacement="floating"></ion-input>
+      </ion-item>
+      <ion-item class="input">
+        <ion-select (ionChange)="selectTrimestre($event)" placeholder="Seleccione Trimestre">
+          <ion-select-option value="1">Primer Trimestre</ion-select-option>
+          <ion-select-option value="2">Segundo Trimestre</ion-select-option>
+          <ion-select-option value="3">Tercer Trimestre</ion-select-option>
+          <ion-select-option value="4">Cuarto Trimestre</ion-select-option>
+        </ion-select>
+      </ion-item>
+      
+      <ion-button (click)="insertNewAnno(annoInput,trimestreInput)" class="btn">Agregar Nuevo Trimestre</ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

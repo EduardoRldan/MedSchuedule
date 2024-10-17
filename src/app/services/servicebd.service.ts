@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 import { Platform } from '@ionic/angular';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlerttoastService } from './alerttoast.service';
 import { ObjectHandlerService } from './object-handler.service';
@@ -10,6 +10,9 @@ import { CitaMedica } from '../classes/cita-medica';
 import { Paciente } from '../classes/paciente';
 import { BlobConversionService } from './blob-conversion.service';
 import { Medic } from '../classes/medic';
+import { TodayDateService } from './today-date.service';
+import { Especialidad } from '../classes/especialidad';
+import { User } from '../classes/user';
 
 
 @Injectable({
@@ -75,7 +78,8 @@ export class ServicebdService {
 "INSERT OR IGNORE INTO medico(numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user) VALUES(18007012,'5','Diego','Andres','Fernandez','Oliva',981744765,'Box 1',30,1,1)",
 "INSERT OR IGNORE INTO medico(numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user) VALUES(18456789,'k','Pablo','Rodrigo','Troncoso','Ortega',981744765,'Box 2',30,2,2)",
 "INSERT OR IGNORE INTO medico(numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user) VALUES(21546789,'0','Adolfo','Roberto','Troncoso','Ortega',981744765,'Box 3',30,3,3)",
-"INSERT OR IGNORE INTO medico(numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user) VALUES(19321556,'2','Christopher','Cristobal','Bahamondes','Vargas',981744765,'Box 4',30,4,4)"
+"INSERT OR IGNORE INTO medico(numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user) VALUES(19321556,'2','Christopher','Cristobal','Bahamondes','Vargas',981744765,'Box 4',30,4,4)",
+"INSERT OR IGNORE INTO user(email, pw, active, foto_perfil, id_role) VALUES('admin@admin.com','admin654321',1,'',3);"
   ]
 
   queryTables : any = [
@@ -107,7 +111,7 @@ export class ServicebdService {
     private storage : NativeStorage,
     private toast : AlerttoastService,
     private ec : EncoderService,
-    private bc : BlobConversionService) {
+    private today : TodayDateService) {
       this.createDB();
   }
   createDB(){
@@ -387,21 +391,23 @@ export class ServicebdService {
     }).catch(e => console.log('DFO: Error obteniendo lista: '+ JSON.stringify(e)))
   }
 
-  async getSpecialities(){
+  getSpecialities() : Observable<any>{
     let response = [];
-    await this.database.executeSql('SELECT * FROM especialidad',[])
-    .then((res) =>{
-      if (res.rows.length>0){
-        for (let i = 0; i< res.rows.length; i++){
-          let esp = {
-            id : res.rows.item(i).id_esp,
-            nombre : res.rows.item(i).nom_esp
+    return new Observable(observer => {
+      this.database.executeSql('SELECT * FROM especialidad;',[])
+      .then((res) =>{
+        if(res.rows.length>0){
+          for(let i = 0;i<res.rows.length;i++){
+            let esp = new Especialidad(
+              res.rows.item(i).id_esp, 
+              res.rows.item(i).nom_esp)
+            response.push(esp);
           }
-          response.push(esp);
         }
-      }
-      return response;
-    }).catch(e => console.log('DFO: Error en obtener especialidades: '+ JSON.stringify(e)))
+        observer.next(response)
+        observer.complete()
+      }).catch(e => console.log('DFO: error obteniendo especialidades '+JSON.stringify(e)))
+    })
   }
 
   getAllMedics(){
@@ -772,8 +778,19 @@ export class ServicebdService {
     }).catch(e => console.log('DFO: error cambiando la contraseña '+JSON.stringify(e)))
   }
 
-  insertLog(date : string, userId : number, logType : number){
-    const query = 'INSERT INTO log'
+  insertLog(userId : number, logType : number){
+    const date = new Date(Date.now());
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hr = date.getHours();
+    const min = date.getMinutes();
+    const hrMin = hr.toString()+':'+min.toString();
+    return this.database.executeSql('INSERT INTO log(anno_log, mes_log, dia_log, hora_log, id_user, id_type) VALUES(?, ?, ?, ?, ?, ?);',
+      [year, month, day, hrMin, userId, logType])
+      .then(() =>{
+        console.log('DFO: Log entry lista')
+      }).catch(e => console.log('DFO: error creando log entry '+JSON.stringify(e)))
   }
 
   async checkEmailExists(email : string) : Promise<boolean>{
@@ -788,12 +805,211 @@ export class ServicebdService {
   }
 
   /// SOLO POR PROPOSITOS DE TESTING, NO USAR
-  getAllUsers(){
-    return this.database.executeSql('SELECT COUNT(*) AS count FROM role;',[])
-    .then((res) => {
-      console.log('DFO: Usuarios registrados :'+ res.rows.item(0).count)
-      //return result[0] as number;
+  async getAllUsers() : Promise<number>{
+    const result = await this.database.executeSql('SELECT COUNT(*) AS count FROM user;',[])
+    return result.rows.item(0).count;
+  }
+
+  getAllUsersObj() : Observable<Array<User>>{
+    let response : Array<User> = []
+    return new Observable(observer => {
+      this.database.executeSql('SELECT * FROM user;',[])
+      .then((res) => {
+        for(let i = 0;i<res.rows.length;i++){
+          let userOb = new User(
+            res.rows.item(i).id_user,
+            res.rows.item(i).email,
+            res.rows.item(i).active,
+            res.rows.item(i).foto_perfil,
+            res.rows.item(i).id_role
+          )
+          response.push(userOb)
+        }
+        observer.next(response)
+        observer.complete()
+      }).catch(e => this.toast.presentToast('Error al obtener lista de usuarios '+JSON.stringify(e)))
     })
+  }
+
+  getLogs(): Observable<any[]>{
+    let result = []
+    let obj = {
+      idLog : 0,
+      annoLog : 0,
+      mesLog : 0,
+      diaLog: 0,
+      horaLog : "",
+      idUser : 0,
+      idType : 0,
+      type : ""
+    }
+    return new Observable(observer => {
+      this.database.executeSql('SELECT lg.id_log AS id_log, lg.anno_log AS anno_log, lg.mes_log AS mes_log, lg.dia_log AS dia_log, lg.hora_log AS hora_log, lg.id_user AS id_user, lg.id_type AS id_type, ty.desc_type AS type FROM log lg JOIN log_type ty ON lg.id_type = ty.id_type ;',[])
+      .then((res) => {
+        for (let i = 0;i<res.rows.length;i++){
+          obj = {
+            idLog : res.rows.item(i).id_log,
+            annoLog : res.rows.item(i).anno_log,
+            mesLog : res.rows.item(i).mes_log,
+            diaLog : res.rows.item(i).dia_log,
+            horaLog : res.rows.item(i).hora_log,
+            idUser : res.rows.item(i).id_user,
+            idType : res.rows.item(i).id_type,
+            type : res.rows.item(i).type 
+          }
+          result.push(obj);
+        }
+        observer.next(result)
+        observer.complete();
+      }).catch(e => console.log('DFO: error al obtener logs desde BD '+JSON.stringify(e)))
+    })
+  }
+
+  updateActive(idUser : number, activeValue : number){
+    return this.database.executeSql('UPDATE user SET active=? WHERE id_user=? ;',[activeValue, idUser])
+    .then(() =>{
+      this.toast.presentToast('El usuario ha sido actualizado')
+    }).catch(e => this.toast.presentToast('DFO: error actualizando cuenta '+JSON.stringify(e)))
+  }
+
+  getLogType(): Observable<any> {
+    let response = [];
+    return new Observable(observer => {
+      this.database.executeSql('SELECT * FROM log_type;',[])
+      .then((res) => {
+        if(res.rows.length>0){
+          for (let i = 0;i<res.rows.length;i++){
+            let type = {
+              idType : res.rows.item(i).id_type,
+              descLog : res.rows.item(i).desc_type
+            }
+            response.push(type)
+          }
+          observer.next(response)
+          observer.complete();
+        }
+      }).catch(e => this.toast.presentToast('Error obteniendo Log Types '+JSON.stringify(e)))
+    })
+  }
+
+  getListAnnoTrimestre() : Observable<any>{
+    // es diferente del otro porque de por sí le doy la lista de trimestres aunque no esten activos
+    let response = [];
+    return new Observable(observer => {
+      this.database.executeSql('SELECT * FROM anno;',[])
+      .then((res) => {
+        if(res.rows.length>0){
+          for(let i = 0;i<res.rows.length;i++){
+            let ob = {
+              idAnno : res.rows.item(i).id_anno,
+              anno : res.rows.item(i).anno,
+              idTrimestre : res.rows.item(i).id_trimestre,
+              active : res.rows.item(i).active
+            }
+            response.push(ob)
+          }
+          observer.next(response);
+          observer.complete();
+        }
+      }).catch(e => console.log('Error Año '+JSON.stringify(e)))
+    })
+  }
+
+  async insertNewValues(tableVal : number, val : string){
+    // recibe 1 o 2 dependiendo si es la tabla especialidad o log_type
+    if(tableVal == 1){
+      await this.database.executeSql('INSERT INTO especialidad(nom_esp) VALUES(?);',[val])
+      .then(() => {
+        this.toast.presentToast('Nueva Especialidad agregada')
+      }).catch(e => this.toast.presentToast('Error al agregar nuevo dato '+JSON.stringify(e)))
+    }
+    if(tableVal == 2){
+      await this.database.executeSql('INSERT INTO log_type(desc_type) VALUES(?);',[val])
+      .then(() => {
+        this.toast.presentToast('Nuevo Log Type agregado')
+      }).catch(e => this.toast.presentToast('Error al agregar nuevo dato '+JSON.stringify(e)))
+    }
+  }
+
+  async deleteValues(tableVal : number, id: number){
+    if(tableVal == 1){
+      await this.database.executeSql('DELETE FROM especialidad WHERE id_esp=? ;',[id])
+      .then(() =>{
+        this.toast.presentToast('Especiliadad eliminada')
+      }).catch(e => this.toast.presentToast('Error al eliminar especialidad '+JSON.stringify(e)))
+    }
+    if(tableVal == 2){
+      await this.database.executeSql('DELETE FROM log_type WHERE id_type=? ;',[id])
+      .then(() => {
+        this.toast.presentToast('Log Type eliminado')
+      }).catch(e => this.toast.presentToast('Error al eliminar Log Type '+JSON.stringify(e)))
+    }
+  }
+
+  newAnnoTrimestre(anno : number, idTrimestre : number){
+    return this.database.executeSql('INSERT INTO anno(anno, id_trimestre, active) VALUES(?,?,0);',
+      [anno, idTrimestre])
+    .then(() => {
+      this.toast.presentToast('Nuevo Año-Trimestre Agregado')
+    }).catch(e => this.toast.presentToast('Error al agregar nuevo dato '+JSON.stringify(e)))
+  }
+
+  updateStatAnnoTrimestre(idAnno : number, val : number){
+    return this.database.executeSql('UPDATE anno SET active=? WHERE id_anno=? ;',[val, idAnno])
+    .then(() => {
+      this.toast.presentToast('Año-Trimestre ha sido actualizado')
+    }).catch(e => this.toast.presentToast('Error al actualizar Año-Trimestre '+JSON.stringify(e)))
+  }
+
+  async createUserFromAdmin(role : number, objArray : Array<object>){
+    if(role==1){
+      // paciente
+      let userOb = Object.values(objArray[0]);
+      let patOb = Object.values(objArray[1]);
+      await this.database.executeSql('INSERT INTO user(email, pw, active, foto_perfil, id_role) VALUES(?, ?, ?, ?, ?);',
+        [userOb[0],userOb[1],1,'',1])
+        .then(async () =>{
+          await this.getIdUserPatient(userOb[0])
+          .then(async() =>{
+            if(this.gotId>0){
+              // orden de los elementos pnombre, snombre, apaterno, amaterno, numrun, dvrun, phone
+              await this.database.executeSql('INSERT INTO paciente(numrun_paciente, dvrun_paciente, pnombre_paciente, snombre_paciente, apaterno_paciente, amaterno_paciente, tel_paciente, id_user) '+
+                'VALUES(?,?,?,?,?,?,?,?)',
+                [patOb[4],patOb[5],patOb[0],patOb[1],patOb[2],patOb[3],patOb[6],this.gotId])
+                .then(() =>{
+                  this.toast.presentToast('Usuario paciente creado')
+                }).catch(e => this.toast.presentToast('Error creando Paciente '+JSON.stringify(e)))
+            }
+          }).catch(e => this.toast.presentToast('Error obteniendo ID '+JSON.stringify(e)))
+        }).catch(e => this.toast.presentToast('Error creando usuario '+JSON.stringify(e)))
+    }
+    if(role==2){
+      let userOb = Object.values(objArray[0]);
+      let medOb = Object.values(objArray[1]);
+      await this.database.executeSql('INSERT INTO user(email, pw, active, foto_perfil, id_role) VALUES(?, ?, ?, ?, ?);',
+        [userOb[0],userOb[1],1,'',2])
+        .then(async () =>{
+          await this.getIdUserPatient(userOb[0])
+          .then(async() =>{
+            if(this.gotId>0){
+              // orden pnombre, snombre, apaterno, amaterno, numrun, dvrun, phone, box, idEsp, bloque
+              await this.database.executeSql('INSERT INTO medico(numrun_medico, dvrun_medico, pnombre_medico, snombre_medico, apaterno_medico, amaterno_medico, tel_medico, box_medico, tiempo_bloque, id_esp, id_user) VALUES(?,?,?,?,?,?,?,?,?,?,?);',
+                [medOb[4],medOb[5],medOb[0],medOb[1],medOb[2],medOb[3],medOb[6],medOb[7],medOb[9],medOb[8],this.gotId])
+              .then(() =>{
+                this.toast.presentToast('Usuario Médico Creado')
+              }).catch(e => this.toast.presentToast('Error al crear Médico '+JSON.stringify(e)))
+            }
+          }).catch(e => this.toast.presentToast('Error al obtener el ID '+JSON.stringify(e)))
+        }).catch(e => this.toast.presentToast('Error al crear usuario '+JSON.stringify(e)))
+    }
+    if(role==3){
+      let userOb = Object.values(objArray[0]);
+      await this.database.executeSql('INSERT INTO user(email, pw, active, foto_perfil, id_role) VALUES(?, ?, ?, ?, ?);',
+        [userOb[0],userOb[1],1,'',3])
+        .then(() =>{
+          this.toast.presentToast('Usuario Admin creado')
+        }).catch(e => this.toast.presentToast('Error al crear usuario '+JSON.stringify(e)))
+    }
   }
 }
 

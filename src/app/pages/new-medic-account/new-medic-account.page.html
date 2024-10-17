@@ -1,0 +1,138 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Nuevo Usuario</ion-title>
+    <ion-buttons slot="start">
+      <app-btn-back page="/main-admin-page"></app-btn-back>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title>Seleccione el Rol deseado</ion-card-title>
+    </ion-card-header>
+    <ion-item class="input">
+      <ion-select (ionChange)="selectRole($event)" placeholder="Seleccione Rol">
+        <ion-select-option value="1">Paciente</ion-select-option>
+        <ion-select-option value="2">Médico</ion-select-option>
+        <ion-select-option value="3">Admin</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-card>
+  <!-- Role 1 -->
+  <ng-container *ngIf="roleSelected == 1">
+    <ion-card class="card">
+      <ion-card-header>
+        <ion-card-title class="card-title">Nuevo Usuario Paciente</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="patientForm" (ngSubmit)="createNewAccount(roleSelected)">
+          <ion-item class="input">
+            <ion-input formControlName="email" type="text" label="Email" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="pw1" type="password" label="Contraseña" labelPlacement="floating"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="pw2" type="password" label="Repetir Contraseña" labelPlacement="floating"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="firstName" type="text" label="Primer Nombre" labelPlacement="floating" placeholder="Juan"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="secondName" type="text" label="Segundo Nombre" labelPlacement="floating" placeholder="José"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="lastName" type="text" label="Apellido Paterno" labelPlacement="floating" placeholder="Barra"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="secondLastName" type="text" label="Apellido Materno" labelPlacement="floating" placeholder="Pérez"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="run" type="text" label="RUN" labelPlacement="floating" placeholder="11222333-4"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="phone" type="number" label="Teléfono (+56)" labelPlacement="floating" placeholder="111222333"></ion-input>
+          </ion-item>
+          <ion-button class="btn" (click)="createNewAccount(roleSelected)" [disabled]="!patientForm.valid">Crear Cuenta</ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+  <!-- Role 2 -->
+  <ng-container *ngIf="roleSelected == 2">
+    <ion-card class="card">
+      <ion-card-header>
+        <ion-card-title class="card-title">Nuevo Usuario Médico</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="medicForm" (ngSubmit)="createNewAccount(roleSelected)">
+          <ion-item class="input">
+            <ion-input formControlName="email" type="text" label="Email" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="pw1" type="password" label="Contraseña" labelPlacement="floating"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="pw2" type="password" label="Repetir Contraseña" labelPlacement="floating"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="firstName" type="text" label="Primer Nombre" labelPlacement="floating" placeholder="Juan"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="secondName" type="text" label="Segundo Nombre" labelPlacement="floating" placeholder="Jose"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="lastName" type="text" label="Apellido Paterno" labelPlacement="floating" placeholder="Barra"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="secondLastName" type="text" label="Apellido Materno" labelPlacement="floating" placeholder="Perez"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="run" type="text" label="RUN" labelPlacement="floating" placeholder="11222333-4"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="phone" type="number" label="Teléfono (+56)" labelPlacement="floating" placeholder="111222333"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="box" type="text" label="Box" labelPlacement="floating" placeholder="Box 1"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-select formControlName="idEsp" placeholder="Especialidad">
+              <ng-container *ngFor="let spec of especialidadesList">
+                <ion-select-option value="{{spec.idEsp}}">{{spec.name}}</ion-select-option>
+              </ng-container>
+            </ion-select>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="block" type="number" label="Tiempo por Bloque (minutos)" labelPlacement="floating" placeholder="30"></ion-input>
+          </ion-item>
+          <ion-button class="btn" (click)="createNewAccount(roleSelected)" [disabled]="!medicForm.valid">Crear Cuenta</ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+  <!-- Role 3 -->
+  <ng-container *ngIf="roleSelected == 3">
+    <ion-card class="card">
+      <ion-card-header>
+        <ion-card-title class="card-title">Nuevo Usuario Admin</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="adminForm" (ngSubmit)="createNewAccount(roleSelected)">
+          <ion-item class="input">
+            <ion-input formControlName="email" type="text" label="Email" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="pw1" type="password" label="Contraseña" labelPlacement="floating"></ion-input>
+          </ion-item>
+          <ion-item class="input">
+            <ion-input formControlName="pw2" type="password" label="Repetir Contraseña" labelPlacement="floating"></ion-input>
+          </ion-item>
+          <ion-button [disabled]="!adminForm.valid" (click)="createNewAccount(roleSelected)" class="btn">Crear Cuenta</ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+</ion-content>

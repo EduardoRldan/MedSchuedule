@@ -1,6 +1,6 @@
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 
-export class SignupForm {
+export class NewMedicForm {
     private formBuilder : FormBuilder;
 
     constructor(formBuilder : FormBuilder){
@@ -30,12 +30,18 @@ export class SignupForm {
                 Validators.pattern('^[0-9]+-[0-9kK]{1}$'),
                 this.rutValido
             ]],
-            email : ['', [Validators.required, Validators.email]],
             phone : ['', [
                 Validators.required, 
                 Validators.pattern('[0-9]*'), 
                 Validators.minLength(9)
             ]],
+            box : ['',[Validators.required]],
+            idEsp : ['',[Validators.required]],
+            block : ['', [
+                Validators.required, 
+                Validators.pattern('[0-9]*'),
+                this.inRange]],
+            email : ['', [Validators.required, Validators.email]],
             pw1 : ['', [
                 Validators.required, 
                 this.minLength8,
@@ -106,6 +112,14 @@ export class SignupForm {
                 console.log('No coinciden')
                 return {confirmPassword : true}
             }
+        }
+        return null
+    }
+
+    inRange(control : FormControl){
+        const block = control.value;
+        if(block<10 || block>60){
+            return {inRange : true}
         }
         return null
     }

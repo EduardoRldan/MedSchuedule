@@ -22,12 +22,6 @@ export class MainLoginPage implements OnInit{
   thisUser! : User;
   isDbReady: boolean = false;
   isLoginValid : boolean = false;
-  private loginReady : BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private role : BehaviorSubject<number> = new BehaviorSubject(-1);
-  private idus : BehaviorSubject<number> = new BehaviorSubject(0)
-  idUserFetched = this.idus.asObservable();
-  roleFetched = this.role.asObservable();
-  isLoggedIn = this.loginReady.asObservable();
 
   constructor(private router: Router, 
     private formBuilder : FormBuilder, 
@@ -43,17 +37,6 @@ export class MainLoginPage implements OnInit{
       this.isDbReady = isReady;
       if (isReady){
         this.toast.presentToast('BASE DE DATOS LISTA')
-      }
-    })
-    this.isLoggedIn.subscribe(ready => {
-      if(ready){
-        this.roleFetched.subscribe(n =>{
-          if(n>0){
-            this.idUserFetched.subscribe(i =>{
-              this.redirectToPage(n,i);
-            })
-          }
-        })
       }
     })
     this.storage.clear().then(() => {
@@ -102,6 +85,7 @@ export class MainLoginPage implements OnInit{
         break;
       case 3:
         this.toast.presentToast('Usted es admin');
+        this.router.navigate(['/tab-admin/main-admin-page'])
         break;
       default:
         this.toast.presentToast('ROLE NO VERIFICADO')
@@ -117,14 +101,13 @@ export class MainLoginPage implements OnInit{
       this.bd.loginValid$.subscribe(async isReady => {
         this.isLoginValid = isReady;
         if(this.isLoginValid){
-          await this.storage.getItem("userLogged").then((data)=> {
+          await this.storage.getItem("userLogged").then(async (data)=> {
             user = data;
             values = Object.values(user);
             let idRole = values[4] as number;
             let idUser = values[0] as number;
-            this.role.next(idRole);
-            this.idus.next(idUser)
-            this.loginReady.next(true);
+            await this.bd.insertLog(idUser,2); // insertará un log al hacer login
+            this.redirectToPage(idRole, idUser);
             this.toast.presentToast('Sesión iniciada correctamente');
           }).catch(e => {
             console.log('DFO: Error al obtener usuario' + JSON.stringify(e))

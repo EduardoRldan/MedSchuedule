@@ -1,0 +1,23 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Panel de Administración</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Bienvenido Administrador</ion-card-title>
+      <ion-card-subtitle>{{date | date :'MMMM d, YYYY'}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-card-title class="card-title">Logs Entries : {{totalLogs}}</ion-card-title>
+      <p>Cuentas Creadas : {{accounts}}</p>
+      <p>Sesiones Iniciadas : {{sessions}}</p>
+    </ion-card-content>
+  </ion-card>
+  <app-btn-router page="/tab-admin/logs" label="Ver Logs" icon="file-tray-full-outline"></app-btn-router>
+  <app-btn-router page="/tab-admin/new-medic-account" label="Crear Cuenta de Médico" icon="medical-outline"></app-btn-router>
+  <app-btn-router page="/tab-admin/users-list" label="Ver Lista de Usuarios" icon="people-circle-outline"></app-btn-router>
+  <app-btn-router page="/tab-admin/manage-db" label="Configurar BBDD" icon="cog-outline"></app-btn-router>
+</ion-content>

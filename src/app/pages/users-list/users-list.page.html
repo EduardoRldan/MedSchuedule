@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Lista de Usuarios</ion-title>
+    <ion-buttons slot="start">
+      <app-btn-back page="/main-admin-page"></app-btn-back>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card class="card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Filtar por Rol</ion-card-title>
+      <ion-radio-group [(ngModel)]="selectRole" (ionChange)="filterList(selectRole)" [value]="selectRole">
+        <ion-radio value="1" labelPlacement="end">Paciente</ion-radio>
+        <ion-radio value="2" labelPlacement="end">Médico</ion-radio>
+        <ion-radio value="3" labelPlacement="end">Admin</ion-radio>
+      </ion-radio-group>
+    </ion-card-header>
+  </ion-card>
+  <ion-list lines="full">
+    <ion-item class="item-list">
+      <ion-label style="min-width: 14rem; max-width:14rem;"><b>Email</b></ion-label>
+      <ion-label style="min-width:2rem; max-width: 2rem;"><b>Rol</b></ion-label>
+      <ion-label slot="end" style="min-width:4rem; max-width:4rem; text-align: center;"><b>Acción</b></ion-label>
+    </ion-item>
+    <ng-container *ngFor="let user of filteredList">
+      <ion-item class="item-list">
+        <ion-label style="min-width: 14rem; max-width:14rem;">{{user.email}}</ion-label>
+        <ion-label style="text-align:center; min-width:2rem; max-width: 2rem;">{{user.idRole}}</ion-label>
+        <ion-button (click)="confirmAlert(user.idUser, 1)" style="margin-left:0;" *ngIf="user.active === 0" fill="clear" slot="end" color="success">
+          <ion-icon size="large" name="checkmark-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="confirmAlert(user.idUser, 0)" style="margin-left:0;" *ngIf="user.active === 1" fill="clear" slot="end" color="danger">
+          <ion-icon size="large" name="close-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ng-container>
+  </ion-list>
+</ion-content>

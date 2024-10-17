@@ -1,6 +1,6 @@
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 
-export class SignupForm {
+export class NewPatientForm {
     private formBuilder : FormBuilder;
 
     constructor(formBuilder : FormBuilder){
@@ -30,12 +30,12 @@ export class SignupForm {
                 Validators.pattern('^[0-9]+-[0-9kK]{1}$'),
                 this.rutValido
             ]],
-            email : ['', [Validators.required, Validators.email]],
             phone : ['', [
                 Validators.required, 
                 Validators.pattern('[0-9]*'), 
                 Validators.minLength(9)
             ]],
+            email : ['', [Validators.required, Validators.email]],
             pw1 : ['', [
                 Validators.required, 
                 this.minLength8,

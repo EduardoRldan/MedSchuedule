@@ -3,12 +3,20 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card class="card">
-    <ion-card-content>
-      <h4>Titulo</h4>
-      <h6>Subtitulo</h6>
-    </ion-card-content>
-  </ion-card>
+  <ion-list lines="full">
+    <ion-item class="item-list">
+      <ion-label style="min-width: 14rem; max-width:14rem;"><b>Email</b></ion-label>
+      <ion-label style="min-width:2rem; max-width: 2rem;"><b>Rol</b></ion-label>
+      <ion-label style="min-width:4rem; max-width:4rem; text-align: center;"><b>Acción</b></ion-label>
+    </ion-item>
+    <ion-item class="item-list">
+      <ion-label style="min-width: 14rem; max-width:14rem;">alguien&#64;alguien.com</ion-label>
+      <ion-label style="text-align:center; min-width:2rem; max-width: 2rem;">1</ion-label>
+      <ion-button style="margin-left:0;" fill="clear" slot="end" color="success">
+        <ion-icon size="large" name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
   <ion-card>
     <ion-card-content>
       <ion-input [(ngModel)]="rut" type="text" label="rut con guion"></ion-input>

@@ -1,64 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Perfil Usuario</ion-title>
+    <ion-title>Perfil de Admin</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card class="card">
-    <ion-card-header>
-      <ion-card-title class="card-title">Foto de perfil</ion-card-title>
-      <ion-card-subtitle>Puede elegir una imagen de la galería o tomar una foto con la cámara.</ion-card-subtitle>
-      <div class="avatar-div">
-        <div class="img-col">
-          <img class="img-display" [src]="avatar" alt="avatar">
-          <ion-button (click)="takePicture()" class="btn img-btn"><ion-icon name="camera-outline"></ion-icon></ion-button>
-        </div>
-        <div>
-          <ion-button [disabled]="!avatarChanged" (click)="submitAvatar(avatarObj)" class="btn">Subir Foto
-            <ion-icon slot="start" name="save-outline"></ion-icon>
-          </ion-button>
-        </div>
-      </div>
-    </ion-card-header>
-  </ion-card>
-  <ion-card class="card">
-    <ion-card-header>
-      <ion-card-title class="card-title">Datos Personales</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <form [formGroup]="updateForm" (ngSubmit)="updateUserData()">
-        <ion-label color="danger" *ngIf="this.updateForm.get('firstName')!.touched && this.updateForm.get('firstName')!.errors?.['pattern']">Solo use letras<br></ion-label>
-        <ion-item class="input">
-          <ion-input formControlName="firstName" type="text" label="Primer Nombre" labelPlacement="floating"></ion-input>
-        </ion-item>
-
-        <ion-label color="danger" *ngIf="this.updateForm.get('secondName')!.touched && this.updateForm.get('secondName')!.errors?.['pattern']">Solo use letras<br></ion-label>
-        <ion-item class="input">
-          <ion-input formControlName="secondName" type="text" label="Segundo Nombre" labelPlacement="floating"></ion-input>
-        </ion-item>
-
-        <ion-label color="danger" *ngIf="this.updateForm.get('lastName')!.touched && this.updateForm.get('lastName')!.errors?.['pattern']">Solo use letras<br></ion-label>
-        <ion-item class="input">
-          <ion-input formControlName="lastName" type="text" label="Apellido Paterno" labelPlacement="floating"></ion-input>
-        </ion-item>
-
-        <ion-label color="danger" *ngIf="this.updateForm.get('secondLastName')!.touched && this.updateForm.get('secondLastName')!.errors?.['pattern']">Solo use letras<br></ion-label>
-        <ion-item class="input">
-          <ion-input formControlName="secondLastName" type="text" label="Apellido Materno" labelPlacement="floating"></ion-input>
-        </ion-item>
-
-        <ion-label color="danger" *ngIf="this.updateForm.get('phone')!.touched && this.updateForm.get('phone')!.errors?.['pattern']">Solo use números<br></ion-label>
-        <ion-item class="input">
-          <ion-input formControlName="phone" type="phone" label="Télefono" labelPlacement="floating"></ion-input>
-        </ion-item>
-        <ion-button *ngIf="isEnabledForm" class="btn" type="submit" [disabled]="!updateForm.valid" (click)="updateUserData()">Guardar Datos
-          <ion-icon slot="start" name="save-outline"></ion-icon>
-        </ion-button>
-        <ion-button *ngIf="!isEnabledForm" class="btn" (click)="enableForm()">Cambiar Datos</ion-button>
-      </form>
-    </ion-card-content>
-  </ion-card>
   <ion-card class="card">
     <ion-card-header>
       <ion-card-title class="card-title">Cambiar dirección de E-mail</ion-card-title>
@@ -70,10 +16,11 @@
           <ion-icon slot="start" name="mail-outline"></ion-icon>
           <ion-input [(ngModel)]="emailInput" type="email" label="Inserte Nuevo E-mail" labelPlacement="floating" placeholder="alguien@correo.com"></ion-input>      
         </ion-item>
-        <ion-button [disabled]="emailInput===''" (click)="changeEmail()" class="btn" type="submit">Cambiar E-mail</ion-button>
+        <ion-button [disabled]="emailInput==''" (click)="changeEmail()" class="btn" type="submit">Cambiar E-mail</ion-button>
       </form>
     </ion-card-content>
   </ion-card>
+  
   <ion-card class="card">
     <ion-card-header>
       <ion-card-title class="card-title">Cambiar Contraseña</ion-card-title>

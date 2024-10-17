@@ -1,0 +1,28 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Logs</ion-title>
+    <ion-buttons slot="start">
+      <!-- <ion-back-button color="light"></ion-back-button> -->
+      <app-btn-back page="/main-admin-page"></app-btn-back>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item class="item-list">
+      <ion-label><b>Fecha</b></ion-label>
+      <ion-label><b>Hora</b></ion-label>
+      <ion-label><b>Usuario</b></ion-label>
+      <ion-label><b>Tipo</b></ion-label>
+    </ion-item>
+    <ng-container *ngFor="let log of logsList">
+      <ion-item class="item-list" lines="full">
+        <ion-label>{{log.annoLog}}/{{log.mesLog}}/{{log.diaLog}}</ion-label>
+        <ion-label>{{log.horaLog}}</ion-label>
+        <ion-label>{{log.idUser}}</ion-label>
+        <ion-label>{{log.idType}}</ion-label>
+      </ion-item>
+    </ng-container>
+  </ion-list>
+</ion-content>

@@ -74,6 +74,34 @@ const routes: Routes = [
     path: 'user-medic-profile',
     loadChildren: () => import('./pages/user-medic-profile/user-medic-profile.module').then( m => m.UserMedicProfilePageModule)
   },
+  {
+    path: 'main-admin-page',
+    loadChildren: () => import('./pages/main-admin-page/main-admin-page.module').then( m => m.MainAdminPagePageModule)
+  },
+  {
+    path: 'logs',
+    loadChildren: () => import('./pages/logs/logs.module').then( m => m.LogsPageModule)
+  },
+  {
+    path: 'new-medic-account',
+    loadChildren: () => import('./pages/new-medic-account/new-medic-account.module').then( m => m.NewMedicAccountPageModule)
+  },
+  {
+    path: 'users-list',
+    loadChildren: () => import('./pages/users-list/users-list.module').then( m => m.UsersListPageModule)
+  },
+  {
+    path: 'manage-db',
+    loadChildren: () => import('./pages/manage-db/manage-db.module').then( m => m.ManageDbPageModule)
+  },
+  {
+    path: 'user-admin-profile',
+    loadChildren: () => import('./pages/user-admin-profile/user-admin-profile.module').then( m => m.UserAdminProfilePageModule)
+  },
+  {
+    path: 'tab-admin',
+    loadChildren: () => import('./pages/tab-admin/tab-admin.module').then( m => m.TabAdminPageModule)
+  },
 
 
 ];
