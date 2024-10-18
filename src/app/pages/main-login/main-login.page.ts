@@ -6,8 +6,9 @@ import { ServicebdService } from 'src/app/services/servicebd.service';
 import { User } from 'src/app/classes/user';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
-import { BehaviorSubject } from 'rxjs';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { Platform } from '@ionic/angular';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-main-login',
@@ -27,7 +28,11 @@ export class MainLoginPage implements OnInit{
     private formBuilder : FormBuilder, 
     private bd : ServicebdService, 
     private storage : NativeStorage, 
-    private toast : AlerttoastService) {
+    private toast : AlerttoastService,
+    private platform : Platform) {
+      this.platform.backButton.subscribeWithPriority(-1, () =>{
+        App.exitApp();
+      })
       LocalNotifications.requestPermissions(); // debería activarse una vez para permitir las notificaciones si es que no estan activas
     }
 
@@ -36,12 +41,21 @@ export class MainLoginPage implements OnInit{
     this.bd.dbReady$.subscribe(isReady => {
       this.isDbReady = isReady;
       if (isReady){
+        this.checkIfUserIsLogged()
+        .then(exists =>{
+          if (exists){
+            console.log('DFO existe')
+          } else {
+            console.log('no existe')
+          }
+        })
         this.toast.presentToast('BASE DE DATOS LISTA')
       }
     })
-    this.storage.clear().then(() => {
-      this.toast.presentToast('Sesiones limpias')
-    })
+
+    // this.storage.clear().then(() => {
+    //   this.toast.presentToast('Sesiones limpias')
+    // })
   }
 
   ionViewWillEnter(){
@@ -84,7 +98,6 @@ export class MainLoginPage implements OnInit{
         })
         break;
       case 3:
-        this.toast.presentToast('Usted es admin');
         this.router.navigate(['/tab-admin/main-admin-page'])
         break;
       default:
@@ -119,6 +132,22 @@ export class MainLoginPage implements OnInit{
       })
     }).catch(e =>{
       console.log('DFO: getUser error '+JSON.stringify(e))
+    })
+  }
+
+  async checkIfUserIsLogged() : Promise<boolean>{
+    try{
+      await this.storage.getItem('userLogged')
+      return true
+    }catch (e) {
+      return false
+    }
+  }
+
+  test(){
+    this.storage.keys()
+    .then((data) => {
+      console.log('DFO: '+data)
     })
   }
   

@@ -7,6 +7,8 @@ import { ObjectHandlerService } from 'src/app/services/object-handler.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 import { Router } from '@angular/router';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
+import { AlertController } from '@ionic/angular';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-user-admin-profile',
@@ -28,7 +30,9 @@ export class UserAdminProfilePage implements OnInit {
     private handler : ObjectHandlerService,
     private bd : ServicebdService,
     private router : Router,
-    private toast : AlerttoastService) { }
+    private toast : AlerttoastService,
+    private alertController : AlertController,
+    private alert : AlertService) { }
 
   ngOnInit() {
     this.loadData();
@@ -120,8 +124,76 @@ export class UserAdminProfilePage implements OnInit {
   }
 
   logOutSession(){
-    this.bd.logOut();
-    this.router.navigate(['']);
+    this.bd.insertLog(this.userLogged.idUser,7)
+    .then(async() =>{
+      this.bd.logOut();
+      await this.alert.alertNavigation('','Su sesión ha sido cerrada','Vuelva a introducir sus credenciales para entrar')
+    })
+    
+    //this.router.navigate(['']);
+  }
+
+  async confirmChangeEmail(){
+    const alert = await this.alertController.create(
+      {
+        header : 'Cambiar Email',
+        subHeader : '¿Está seguro de cambiar su email?',
+        message : 'Su sesión será cerrada al proceder con el cambio, deberá iniciar sesión con su nuevo correo.',
+        buttons : [{
+          text : "Cancelar",
+          role : 'cancel'
+        },
+        {
+          text : "Confirmar",
+          role : "confirm",
+          handler : ()=>{
+            this.changeEmail();
+          }
+        }]
+      });
+    await alert.present();
+  }
+
+  async confirmChangePw(){
+    const alert = await this.alertController.create(
+      {
+        header : 'Cambiar Contraseña',
+        subHeader : '¿Está seguro de cambiar su contraseña?',
+        message : 'Su sesión será cerrada al proceder con el cambio, deberá iniciar sesión con su nueva contraseña.',
+        buttons : [{
+          text : "Cancelar",
+          role : 'cancel'
+        },
+        {
+          text : "Confirmar",
+          role : "confirm",
+          handler : ()=>{
+            this.changePw();
+          }
+        }]
+      });
+    await alert.present();
+  }
+
+  async confirmLogout(){
+    const alert = await this.alertController.create(
+      {
+        header : 'Cerrar Sesión',
+        subHeader : '¿Desea cerrar su sesión activa?',
+        message : '',
+        buttons : [{
+          text : "Cancelar",
+          role : 'cancel'
+        },
+        {
+          text : "Confirmar",
+          role : "confirm",
+          handler : ()=>{
+            this.logOutSession()
+          }
+        }]
+      });
+    await alert.present();
   }
 
 }

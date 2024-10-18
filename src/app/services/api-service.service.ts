@@ -14,7 +14,7 @@ export class ApiServiceService {
   }
   constructor(private http : HttpClient) { }
 
-  getFeriadosAnno(anno : number) : Observable<any>{
+  getFeriadosAnno() : Observable<any>{
     return this.http.get('https://api.boostr.cl/holidays.json').pipe(
       retry(3)
     );

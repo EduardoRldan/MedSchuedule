@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { Medic } from 'src/app/classes/medic';
+import { User } from 'src/app/classes/user';
 import { AlertService } from 'src/app/services/alert.service';
 import { AlerttoastService } from 'src/app/services/alerttoast.service';
 import { ApiServiceService } from 'src/app/services/api-service.service';
@@ -25,6 +26,7 @@ export class MedicHoursPage implements OnInit {
 
   // Medico
   medicLogged! : Medic;
+  userLogged! : User;
   tBloque : number = 30;
 
   // Lista de Consultas año-trimestre
@@ -103,7 +105,7 @@ export class MedicHoursPage implements OnInit {
         this.storage.getItem('annoTrimestre')
         .then((data)=> {
           this.annoTrimestre = data;
-          this.getFeriados(this.annoTrimestre.anno);
+          this.getFeriados();
           this.bd.getAgenda(this.medicLogged.numrunMedico,this.annoTrimestre.idAnno)
           .then(() =>{
             this.storage.getItem('agendaLista')
@@ -143,8 +145,8 @@ export class MedicHoursPage implements OnInit {
     this.showBtnOptions(this.daySelected)
   }
 
-  getFeriados(anno : number){
-    this.api.getFeriadosAnno(anno).subscribe((res) => {
+  getFeriados(){
+    this.api.getFeriadosAnno().subscribe((res) => {
       let val = Object.values(res);
       this.feriadosList = val[1];
     }, (error) =>{
@@ -280,6 +282,7 @@ export class MedicHoursPage implements OnInit {
   }
 
   async submitToDB(){
+    this.bd.insertLog(this.userLogged.idUser,5)
     this.alert.alertNavigation('/tab-medico/main-page-medic','Agendas guardadas','Su agenda ha sido actualizada, los pacientes podrán solicitar citas médicas.')
     return this.bd.insertNewAgenda(this.agendaList)
     

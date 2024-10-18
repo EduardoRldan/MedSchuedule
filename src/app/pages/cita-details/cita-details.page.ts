@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlertController } from '@ionic/angular';
+import { User } from 'src/app/classes/user';
 import { EncoderService } from 'src/app/services/encoder.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 
@@ -25,6 +26,7 @@ export class CitaDetailsPage implements OnInit {
     id : 0
   }
   loadReady : boolean = false;
+  userLogged!: User;
   constructor(
     private storage : NativeStorage,
     private bd : ServicebdService,
@@ -69,6 +71,10 @@ export class CitaDetailsPage implements OnInit {
         estado : sch[9],
         id : sch[10]
       };
+      this.storage.getItem('userLogged')
+      .then((data) => {
+        this.userLogged = data;
+      })
       this.loadReady = true;
     }).catch(e =>{
       console.log('DFO: error encontrando cita '+JSON.stringify(e))
@@ -78,6 +84,7 @@ export class CitaDetailsPage implements OnInit {
   async cancelCita(idCita : number){
     await this.bd.updateCita(idCita,2)
     .then(() =>{
+      this.bd.insertLog(this.userLogged.idUser,4)
       this.router.navigate(['/tab-paciente'])
     })
   }

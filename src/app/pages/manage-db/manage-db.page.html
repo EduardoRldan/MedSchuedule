@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Administración BD</ion-title>
     <ion-buttons slot="start">
-      <app-btn-back page="/main-admin-page"></app-btn-back>
+      <app-btn-back page="/tab-admin/main-admin-page"></app-btn-back>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -57,6 +57,7 @@
   <ion-card class="card">
     <ion-card-header>
       <ion-card-title class="card-title">Tabla Año-Trimestre</ion-card-title>
+      <ion-card-subtitle>Al crear un Año-Trimestre este estará inactivo. Recuerde desactivar el valor vigente antes de activar el valor nuevo.</ion-card-subtitle>
       <ion-list lines="full">
         <ng-container *ngFor="let anno of annoTrimestreList">
           <ion-item class="item-list">

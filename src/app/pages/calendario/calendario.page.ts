@@ -3,6 +3,7 @@ import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlertController } from '@ionic/angular';
 import { CitaMedica } from 'src/app/classes/cita-medica';
+import { User } from 'src/app/classes/user';
 import { AlertService } from 'src/app/services/alert.service';
 import { ServicebdService } from 'src/app/services/servicebd.service';
 import { TodayDateService } from 'src/app/services/today-date.service';
@@ -22,7 +23,7 @@ export class CalendarioPage implements OnInit {
     tiempoBloque : 0,
     boxMedico : ""
   };
-  user : any;
+  userLogged! : User;
   listaCitas : Array<CitaMedica> = [];  // almacena las citas tomadas del medico
   citasDisponibles : Array<CitaMedica> = [];  // almacena los bloques de citas disponibles
   citaMedica : any ={
@@ -87,6 +88,10 @@ export class CalendarioPage implements OnInit {
               //console.log('DFO: Obteniendo citas')
               let list: Array<CitaMedica> = Object.values(data)
               this.listaCitas = list;
+              this.stroage.getItem('userLogged')
+              .then((data) => {
+                this.userLogged = data
+              })
             }).catch(e => {
               this.listaCitas = [];
             })
@@ -235,6 +240,7 @@ export class CalendarioPage implements OnInit {
       }
       this.bd.insertCitaMedica(citaObj)
       .then(() =>{
+        this.bd.insertLog(this.userLogged.idUser,3);
         this.stroage.remove('agenda'+this.medicObj.numrunMedico) // elimina la lista de agendas del medico para que la cache no la intente volver a sumar
         this.stroage.remove('citas'+this.medicObj.numrunMedico) // elimina la lista de citas medicas del doctor para que la cache no la intente volver a llenar
         this.alert.alertNavigation('/tab-paciente/main-page','Hora agendada','Su hora ha sido agendada, recibirá un email con más información.')

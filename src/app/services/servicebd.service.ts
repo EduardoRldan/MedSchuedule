@@ -4,11 +4,9 @@ import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlerttoastService } from './alerttoast.service';
-import { ObjectHandlerService } from './object-handler.service';
 import { EncoderService } from './encoder.service';
 import { CitaMedica } from '../classes/cita-medica';
 import { Paciente } from '../classes/paciente';
-import { BlobConversionService } from './blob-conversion.service';
 import { Medic } from '../classes/medic';
 import { TodayDateService } from './today-date.service';
 import { Especialidad } from '../classes/especialidad';
@@ -82,21 +80,6 @@ export class ServicebdService {
 "INSERT OR IGNORE INTO user(email, pw, active, foto_perfil, id_role) VALUES('admin@admin.com','admin654321',1,'',3);"
   ]
 
-  queryTables : any = [
-    'CREATE TABLE IF NOT EXISTS especialidad (id_esp INTEGER PRIMARY KEY AUTOINCREMENT, nom_esp VARCHAR(30) NOT NULL);',
-    'CREATE TABLE IF NOT EXISTS role (id_role INTEGER PRIMARY KEY AUTOINCREMENT, role_name VARCHAR(15) NOT NULL);',
-    'CREATE TABLE IF NOT EXISTS trimestre (id_trimestre INTEGER PRIMARY KEY AUTOINCREMENT, nom_trimestre VARCHAR(10) NOT NULL);',
-    'CREATE TABLE IF NOT EXISTS estado_cita (id_estado INTEGER PRIMARY KEY AUTOINCREMENT, nom_estado VARCHAR(10) NOT NULL);',
-    'CREATE TABLE IF NOT EXISTS log_type (id_type INTEGER PRIMARY KEY AUTOINCREMENT, desc_type VARCHAR(50) NOT NULL);',
-    'CREATE TABLE IF NOT EXISTS user (id_user INTEGER PRIMARY KEY AUTOINCREMENT, email VARCHAR(50) UNIQUE NOT NULL, pw VARCHAR(100) NOT NULL, active INTEGER CHECK(active IN (0,1)), foto_perfil BLOB, id_role INTEGER NOT NULL, FOREIGN KEY(id_role) REFERENCES role(id_role));',
-    'CREATE TABLE IF NOT EXISTS log (id_log INTEGER PRIMARY KEY AUTOINCREMENT, anno_log INTEGER NOT NULL, mes_log INTEGER NOT NULL, dia_log INTEGER NOT NULL, hora_log VARCHAR(10) NOT NULL, id_user INTEGER NOT NULL, id_type INTEGER NOT NULL, FOREIGN KEY(id_user) REFERENCES user(id_user), FOREIGN KEY(id_type) REFERENCES log_type(id_type));',
-    'CREATE TABLE IF NOT EXISTS medico (numrun_medico INTEGER PRIMARY KEY, dvrun_medico VARCHAR(1) NOT NULL, pnombre_medico VARCHAR(50) NOT NULL, snombre_medico VARCHAR(50) NOT NULL, apaterno_medico VARCHAR(50) NOT NULL, amaterno_medico VARCHAR(50) NOT NULL, tel_medico INTEGER NOT NULL, box_medico VARCHAR(50) NOT NULL, tiempo_bloque INTEGER NOT NULL, id_esp INTEGER NOT NULL, id_user INTEGER NOT NULL, FOREIGN KEY(id_esp) REFERENCES especialidad(id_esp), FOREIGN KEY(id_user) REFERENCES user(id_user));',
-    'CREATE TABLE IF NOT EXISTS paciente (numrun_paciente INTEGER PRIMARY KEY, dvrun_paciente VARCHAR(1) NOT NULL, pnombre_paciente VARCHAR(50) NOT NULL, snombre_paciente VARCHAR(50) NOT NULL, apaterno_paciente VARCHAR(50) NOT NULL, amaterno_paciente VARCHAR(50) NOT NULL, tel_paciente INTEGER NOT NULL, id_user INTEGER NOT NULL, FOREIGN KEY(id_user) REFERENCES user(id_user));',
-    'CREATE TABLE IF NOT EXISTS cita_medica (id_cita INTEGER PRIMARY KEY AUTOINCREMENT, anno_cita INTEGER NOT NULL, mes_cita INTEGER NOT NULL, dia_cita INTEGER NOT NULL, hora_cita VARCHAR(5) NOT NULL, id_estado INTEGER NOT NULL, numrun_paciente INTEGER NOT NULL, numrun_medico INTEGER NOT NULL, FOREIGN KEY(id_estado) REFERENCES estado_cita(id_estado), FOREIGN KEY(numrun_paciente) REFERENCES paciente(numrun_paciente), FOREIGN KEY(numrun_medico) REFERENCES medico(numrun_medico));',
-    'CREATE TABLE IF NOT EXISTS mes (id_mes INTEGER PRIMARY KEY AUTOINCREMENT, nom_mes VARCHAR(12) NOT NULL, id_trimestre INTEGER NOT NULL, FOREIGN KEY(id_trimestre) REFERENCES trimestre(id_trimestre));',
-    'CREATE TABLE IF NOT EXISTS anno (id_anno INTEGER PRIMARY KEY AUTOINCREMENT, anno INTEGER NOT NULL, id_trimestre INTEGER NOT NULL, active INTEGER CHECK(active in (0,1)), FOREIGN KEY(id_trimestre) REFERENCES trimestre(id_trimestre));',
-    'CREATE TABLE IF NOT EXISTS agenda_medica (id_agenda INTEGER PRIMARY KEY AUTOINCREMENT, mes_agenda INTEGER NOT NULL, dia_agenda INTEGER NOT NULL, hora_inicio VARCHAR(5) NOT NULL, hora_termino VARCHAR(5), numrun_medico INTEGER NOT NULL, id_anno INTEGER NOT NULL, FOREIGN KEY(numrun_medico) REFERENCES medico(numrun_medico), FOREIGN KEY(id_anno) REFERENCES anno(id_anno));'
-  ];
   queryInsertDefaults : any;
   insertsReady : boolean = false;
   // creacion de tablas
@@ -122,7 +105,6 @@ export class ServicebdService {
       }).then((db: SQLiteObject) =>{
         this.database = db;
         this.toast.presentToast('DFO: BD creada')
-        //this.createTables()
         this.createTablesByBulk();
       }).catch((e: string) => this.toast.presentToast('Error al crear base de datos: '+ JSON.stringify(e), 500));
     })
@@ -130,66 +112,12 @@ export class ServicebdService {
   async createTablesByBulk(){
     for(let i = 0; i<this.bulkQuery.length; i++){
       let query = this.bulkQuery[i];
-      this.database.executeSql(query,[])
+      await this.database.executeSql(query,[])
       .then(async () => {
-        console.log('DFO: insertando: '+ query)
+        //console.log('DFO: insertando: '+ query)
       }).catch(e => console.log('DFO: Fallo el query: ',JSON.stringify(e)))
     }
     this.isDBReady.next(true);
-  }
-  async createTables(){
-    for (let i = 0; i < this.queryTables.length; i++){
-      let query = this.queryTables[i];
-      try{
-        await this.database.executeSql(query, []);
-        this.toast.presentToast( (i+1)+' Tablas creadas');
-        console.log('DFO: Tabla creada')
-        // no se si falta algo aquí
-      } catch(e) {
-        this.toast.presentToast('Error al crear tabla :' + JSON.stringify(e));
-        console.log('DFO: Error al crear tabla: '+ JSON.stringify(e));
-      }
-    }
-    this.toast.presentToast('Tablas completadas');
-    console.log("DFO: Tablas completas");
-    this.insertDefaultValues();
-  }
-  async insertDefaultValues(){
-    console.log("DFO: en insertDefaultValues");
-    let ready : boolean = false;
-    await fetch('./assets/json/queryInsertDefaults.json')
-    .then(res => res.json())
-    .then(json => {
-      this.queryInsertDefaults = json;
-    })
-    /// SOLO EN CASO DE PRUEBA, elimina todos los elementos por defecto de la BD
-    /// considerar que los elementos autoincrementables cambiaran de valor cada vez que se ejecute un insert nuevo.
-    // for (let elemento of this.queryInsertDefaults) {
-    //   const table = elemento.table;
-    //   const query = "DELETE FROM "+ table + ";"
-    //   await this.database.executeSql(query, [])
-    //   .then(()=> {
-    //     console.log('Limpiando Registros')
-    //   })
-    //   .catch(e => this.toast.presentToast('Error de registro: '+ JSON.stringify(e)));
-    // }
-
-    for (let elemento of this.queryInsertDefaults) {
-      const table = elemento.table;
-      const values = elemento.values;
-      const columns = elemento.columns;
-      const query = "INSERT OR IGNORE INTO "+ table + "("+ columns +")"+ " VALUES(" + values + ");"
-      await this.database.executeSql(query, [])
-      .then(()=> {
-        console.log('DFO: Dato insertado en '+ table + ' Columnas ' + columns + ' Valores '+ values);
-        ready = true;
-      })
-      .catch(e => this.toast.presentToast('Error de registro: '+ JSON.stringify(e))); 
-    }
-    //await this.defaultMedicAcc();
-    this.toast.presentToast('Registros completos');
-    this.isDBReady.next(true);  // indica que la base de datos está lista
-    this.insertsReady = ready;
   }
 
   getUser(email : string, pw : string){
@@ -282,6 +210,7 @@ export class ServicebdService {
       .then(async () =>{
         console.log('DFO: Obteniendo ID')
         if (this.gotId>0){
+          this.insertLog(this.gotId,1);
           await this.createPatient(patObj, this.gotId);
         }
       })
@@ -437,14 +366,31 @@ export class ServicebdService {
       //return response;
     }).catch(e => console.log('DFO: Error obteniendo lista de medicos :', JSON.stringify(e)));
   }
+
+  getMesesFromTrimestre(idTrimestre : number) : Observable<Array<number>> {
+    // devuelve una lista de meses
+    let mesList : Array<number> = []
+    return new Observable(observer => {
+      this.database.executeSql('SELECT id_mes FROM mes WHERE id_trimestre=? ;',[idTrimestre])
+      .then((res) => {
+        if(res.rows.length>0){
+          for (let i = 0;i<res.rows.length;i++){
+            mesList.push(res.rows.item(i).id_mes);
+          }
+          observer.next(mesList);
+          observer.complete();
+        }
+      })
+    }) 
+    
+  }
   /// METODOS RELACIONADOS A agenda_medica
   getAnoTrimestre(){
     console.log('DFO: bd.getAnoTrimestre');
     let meses: Array<number> = []
-    return this.database.executeSql('SELECT a.id_anno AS id, a.anno AS anno, a.id_trimestre AS id_trimestre, m.id_mes AS mes FROM anno a LEFT JOIN mes m ON a.id_trimestre = m.id_trimestre WHERE m.id_trimestre = a.id_trimestre',[])
+    return this.database.executeSql('SELECT a.id_anno AS id, a.anno AS anno, a.id_trimestre AS id_trimestre, m.id_mes AS mes FROM anno a LEFT JOIN mes m ON a.id_trimestre = m.id_trimestre WHERE m.id_trimestre = a.id_trimestre AND a.active = 1',[])
     .then(res => {
       if (res.rows.length>0){
-        // console.log('DFO: LARGO LISTA: '+res.rows.length)
         for (let i= 0; i<res.rows.length;i++){
           let mes = res.rows.item(i).mes;
           meses.push(mes);
@@ -733,9 +679,6 @@ export class ServicebdService {
   }
 
   async updateAvatar(idUser : number, avatar : string){
-    //const arrbuffer = await this.bc.convert(avatar)
-    //const byteArrayAvatar = new Uint8Array(arrbuffer)
-    ///console.log('DFO: byteArray '+byteArrayAvatar)
     return this.database.executeSql('UPDATE user SET foto_perfil=? WHERE id_user=? ;',[avatar, idUser])
     .then(() =>{
       this.toast.presentToast('Foto de perfil agregada exitosamente')
@@ -759,8 +702,6 @@ export class ServicebdService {
       }
     })
   }
-
-
 
   updatePw(newPw : string, id : number){
     return this.database.executeSql('UPDATE user SET pw=? WHERE id_user=? ;',[newPw,id])
